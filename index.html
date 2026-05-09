@@ -5,160 +5,156 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>BLACKSNIPER SMC - GLOBAL</title>
     <style>
-        :root { --bg: #05070a; --glass: rgba(15, 20, 28, 0.95); --neon: #00f2ff; --gold: #ffc107; --text: #f8fafc; --red: #ff3333; --border: rgba(255, 255, 255, 0.1); }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; transition: 0.3s; }
-        .lang-container { position: fixed; top: 10px; right: 10px; z-index: 9999; }
-        .lang-select { background: #000; color: var(--neon); border: 1px solid var(--neon); padding: 5px; border-radius: 5px; font-size: 10px; }
-        .nav-container { background: var(--glass); display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--border); position: sticky; top:0; z-index: 1000; }
-        .nav-btn { padding: 15px 5px; font-size: 9px; font-weight: bold; text-transform: uppercase; cursor: pointer; color: #64748b; text-align: center; }
-        .nav-btn.active { color: var(--neon); border-bottom: 2px solid var(--neon); }
-        .glass-card { background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 15px; margin: 10px; }
-        .action-btn { width: 100%; padding: 15px; border-radius: 12px; border: none; background: #3b82f6; color: white; font-weight: bold; margin-top: 10px; cursor: pointer; }
-        .faq-item { background: rgba(255,255,255,0.03); margin: 8px 0; border-radius: 10px; border: 1px solid var(--border); }
-        .faq-question { padding: 12px; cursor: pointer; font-size: 11px; font-weight: bold; }
-        .faq-answer { display: none; padding: 12px; font-size: 10px; color: #aaa; border-top: 1px solid var(--border); }
-        .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 10px; }
+        :root { --bg: #05070a; --neon: #00f2ff; --gold: #ffc107; --text: #f8fafc; --red: #ff3333; --green: #00ff88; --border: rgba(255, 255, 255, 0.1); }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
+        #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .pin-box { background: transparent; border: none; border-bottom: 2px solid var(--neon); color: var(--neon); font-size: 32px; text-align: center; width: 160px; outline: none; letter-spacing: 8px; margin-bottom: 20px; }
+        .lang-container { position: fixed; top: 12px; right: 12px; z-index: 6000; }
+        .lang-select { background: #000; color: var(--neon); border: 1px solid var(--neon); padding: 5px; border-radius: 6px; font-size: 10px; font-weight: bold; }
+        .nav-bar { position: sticky; top: 0; background: rgba(15, 20, 28, 0.95); display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--border); z-index: 5000; backdrop-filter: blur(15px); }
+        .nav-item { padding: 16px 2px; font-size: 9px; font-weight: bold; text-align: center; cursor: pointer; color: #64748b; text-transform: uppercase; }
+        .nav-item.active { color: var(--neon); border-bottom: 2px solid var(--neon); }
+        .glass-card { background: rgba(15, 20, 28, 0.95); border: 1px solid var(--border); border-radius: 20px; padding: 18px; margin: 12px; }
+        .action-btn { width: 100%; padding: 16px; border-radius: 12px; border: none; background: #3b82f6; color: white; font-weight: bold; margin-top: 12px; cursor: pointer; }
+        #radar-screen { background: #000; border-radius: 12px; padding: 12px; height: 140px; font-family: 'Courier New', monospace; font-size: 9px; color: var(--neon); overflow-y: auto; border: 1px solid var(--border); }
+        .faq-item { margin-top: 8px; border: 1px solid var(--border); border-radius: 10px; }
+        .faq-q { padding: 12px; cursor: pointer; font-size: 11px; font-weight: bold; background: rgba(255,255,255,0.02); }
+        .faq-a { display: none; padding: 12px; font-size: 10px; color: #aaa; border-top: 1px solid var(--border); }
         input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; margin-top: 8px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-<div class="lang-container">
-    <select id="langSwitcher" class="lang-select" onchange="translatePage()">
-        <option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option>
-        <option value="es">🇪🇸 ES</option><option value="de">🇩🇪 DE</option><option value="ar">🇸🇦 AR</option>
-    </select>
-</div>
-
-<div class="nav-container">
-    <div class="nav-btn active" id="nav-dash" onclick="showTab('dash', this)">DASH</div>
-    <div class="nav-btn" id="nav-macro" onclick="showTab('macro', this)">MACRO</div>
-    <div class="nav-btn" id="nav-team" onclick="showTab('team', this)">TEAM</div>
-    <div class="nav-btn" id="nav-config" onclick="showTab('config', this)">API</div>
-</div>
-
-<!-- DASHBOARD -->
-<div id="dash" class="tab-content" style="padding:10px;">
-    <div class="glass-card">
-        <h3 id="engine-status">SMC ENGINE V57 ACTIVE</h3>
-        <p><span id="txt-balance">SOLDE</span>: $25.00 | <span id="txt-pnl">PNL</span>: +$0.00</p>
-        <button id="btn-panic" class="action-btn" style="background:var(--red);">🚨 PANIC SELL</button>
+    <!-- LOGIN -->
+    <div id="login-screen">
+        <div id="log-txt" style="color:var(--gold); font-weight:bold; letter-spacing:3px; margin-bottom:20px;">BLACKSNIPER LOGIN</div>
+        <input type="password" id="pin-entry" class="pin-box" maxlength="6" placeholder="••••••">
+        <button id="log-btn" class="action-btn" style="width:140px;" onclick="checkLogin()">ACCÈS</button>
     </div>
-</div>
 
-<!-- MACRO NEWS -->
-<div id="macro" class="tab-content" style="display:none; padding:10px;">
-    <div class="glass-card" style="padding:0;">
-        <iframe id="macro-frame" src="https://www.tradingview-widget.com/embed-widget/timeline/?colorTheme=dark&locale=fr" width="100%" height="450" frameborder="0"></iframe>
+    <!-- LANG SELECTOR -->
+    <div class="lang-container">
+        <select id="langSwitcher" class="lang-select" onchange="applyFullTranslation()">
+            <option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option>
+            <option value="es">🇪🇸 ES</option><option value="de">🇩🇪 DE</option><option value="ar">🇸🇦 AR</option>
+        </select>
     </div>
-</div>
 
-<!-- TEAM & FAQ -->
-<div id="team" class="tab-content" style="display:none; padding:10px;">
-    <div class="glass-card">
-        <h3 id="team-title">SHIELD LEADERS (8)</h3>
-        <div class="team-grid">
-            <div>🟢 Albert</div><div>🟢 Marie</div><div>🟢 Sébastien</div><div>🟢 Bertrand</div>
-            <div>🟢 Eva</div><div>🟢 Franco</div><div>🟢 Leader 7</div><div>🟢 Leader 8</div>
+    <div class="nav-bar">
+        <div class="nav-item active" id="n-dash" onclick="setTab('dash', this)">DASH</div>
+        <div class="nav-item" id="n-macro" onclick="setTab('macro', this)">MACRO</div>
+        <div class="nav-item" id="n-team" onclick="setTab('team', this)">TEAM</div>
+        <div class="nav-item" id="n-api" onclick="setTab('config', this)">API</div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dash" class="tab-content" style="padding-top:10px;">
+        <div class="glass-card">
+            <h3 id="t-engine" style="margin:0; font-size:14px; color:var(--green);">● SMC ENGINE V57 ACTIVE</h3>
+            <div style="display:flex; justify-content:space-around; margin:20px 0; text-align:center;">
+                <div><small id="t-cap">CAPITAL</small><div style="font-size:22px; color:var(--gold); font-weight:bold;">$25.00</div></div>
+                <div><small id="t-pnl">PNL LIVE</small><div style="font-size:22px; color:var(--green); font-weight:bold;">+$0.00</div></div>
+            </div>
+            <div id="radar-screen"><div id="radar-logs">> INITIALISATION...</div></div>
         </div>
-        <hr style="border: 0.5px solid var(--border); margin: 20px 0;">
-        <h3 id="faq-title">Foire aux Questions</h3>
-        <div class="faq-item"><div class="faq-question" id="q1" onclick="toggleFaq(this)">1. Activation ?</div><div class="faq-answer" id="a1">Utilisez l'onglet API.</div></div>
-        <div class="faq-item"><div class="faq-question" id="q2" onclick="toggleFaq(this)">2. Échangeurs ?</div><div class="faq-answer" id="a2">BingX, Bybit, OKX, Binance, Kraken, KuCoin, Bitget, Mexc.</div></div>
-        <div class="faq-item"><div class="faq-question" id="q3" onclick="toggleFaq(this)">3. Sécurité ?</div><div class="faq-answer" id="a3">Code PIN 197800 requis.</div></div>
+        <div style="padding:0 12px;"><button id="btn-panic" class="action-btn" style="background:var(--red);">🚨 PANIC SELL</button></div>
     </div>
-</div>
 
-<!-- CONFIG API -->
-<div id="config" class="tab-content" style="display:none; padding:10px;">
-    <div class="glass-card">
-        <h3 id="config-title">CONFIGURATION API</h3>
-        <select><option>BINGX</option><option>OKX</option><option>BYBIT</option><option>BINANCE</option><option>BITGET</option></select>
-        <input type="text" id="ph-api" placeholder="API KEY">
-        <input type="password" id="ph-secret" placeholder="SECRET KEY">
-        <input type="password" id="ph-pass" placeholder="PASSPHRASE">
-        <button id="btn-save" class="action-btn">SAUVEGARDER</button>
+    <!-- TEAM & FAQ -->
+    <div id="team" class="tab-content" style="display:none; padding:10px;">
+        <div class="glass-card">
+            <h3 id="t-team-title" style="color:var(--gold); margin-top:0;">SHIELD LEADERS</h3>
+            <div id="leader-list" style="font-size:11px; line-height:1.8;">
+                🟢 Albert (Togo) | 🟢 Marie (Guadeloupe) | 🟢 Sébastien (Bénin) | 🟢 Bertrand (Douala) | 🟢 Eva (Elite) | 🟢 Franco (Expert)
+            </div>
+            <hr style="border:0.5px solid var(--border); margin:20px 0;">
+            <h3 id="t-faq-title">FAQ</h3>
+            <div class="faq-item"><div class="faq-q" id="q1" onclick="tgF(this)">1. Activation ?</div><div class="faq-a" id="a1">Connect API keys.</div></div>
+            <div class="faq-item"><div class="faq-q" id="q2" onclick="tgF(this)">2. Security ?</div><div class="faq-a" id="a2">PIN 197800 required.</div></div>
+        </div>
     </div>
-</div>
 
-<script>
-    const dictionary = {
-        fr: {
-            navDash: "DASH", navMacro: "MACRO", navTeam: "TEAM", navConfig: "API",
-            engine: "SMC ENGINE V57 ACTIF", balance: "SOLDE", pnl: "PNL", panic: "🚨 VENTE PANIQUE",
-            team: "LEADERS SHIELD (8)", faq: "Foire aux Questions",
-            q1: "1. Comment activer ?", a1: "Utilisez l'onglet API pour connecter vos clés.",
-            q2: "2. Échangeurs ?", a2: "Supporte BingX, OKX, Bybit, Binance, Bitget.",
-            q3: "3. Sécurité ?", a3: "Code PIN 197800 et Passphrase cryptée.",
-            config: "CONFIGURATION API", phApi: "CLÉ API", phSecret: "CLÉ SECRÈTE", phPass: "PASSPHRASE", save: "SAUVEGARDER"
-        },
-        en: {
-            navDash: "DASH", navMacro: "MACRO", navTeam: "TEAM", navConfig: "API",
-            engine: "SMC ENGINE V57 ACTIVE", balance: "BALANCE", pnl: "PNL", panic: "🚨 PANIC SELL",
-            team: "SHIELD LEADERS (8)", faq: "Frequently Asked Questions",
-            q1: "1. How to activate?", a1: "Use the API tab to connect your keys.",
-            q2: "2. Exchanges?", a2: "Supports BingX, OKX, Bybit, Binance, Bitget.",
-            q3: "3. Security?", a3: "PIN Code 197800 and encrypted Passphrase.",
-            config: "API CONFIGURATION", phApi: "API KEY", phSecret: "SECRET KEY", phPass: "PASSPHRASE", save: "SAVE SETTINGS"
-        },
-        es: {
-            navDash: "PANEL", navMacro: "MACRO", navTeam: "EQUIPO", navConfig: "API",
-            engine: "SMC ENGINE V57 ACTIVO", balance: "SALDO", pnl: "PNL", panic: "🚨 VENTA DE PÁNICO",
-            team: "LÍDERES SHIELD (8)", faq: "Preguntas Frecuentes",
-            q1: "1. ¿Cómo activar?", a1: "Usa la pestaña API para conectar tus llaves.",
-            q2: "2. ¿Intercambios?", a2: "Soporta BingX, OKX, Bybit, Binance, Bitget.",
-            q3: "3. ¿Seguridad?", a3: "Código PIN 197800 y Frase de contraseña.",
-            config: "CONFIGURACIÓN API", phApi: "CLAVE API", phSecret: "CLAVE SECRETA", phPass: "FRASE DE SEGURIDAD", save: "GUARDAR"
-        },
-        ar: {
-            navDash: "لوحة التحكم", navMacro: "ماكرو", navTeam: "الفريق", navConfig: "API",
-            engine: "محرك SMC V57 نشط", balance: "الرصيد", pnl: "الأرباح", panic: "🚨 بيع ذعر",
-            team: "قادة الدرع (8)", faq: "الأسئلة الشائعة",
-            q1: "1. كيف يتم التفعيل؟", a1: "استخدم علامة تبويب API لربط مفاتيحك.",
-            q2: "2. المنصات؟", a2: "يدعم BingX و OKX و Bybit و Binance.",
-            q3: "3. الأمان؟", a3: "رمز PIN 197800 وكلمة مرور مشفرة.",
-            config: "إعدادات API", phApi: "مفتاح API", phSecret: "المفتاح السري", phPass: "عبارة المرور", save: "حفظ الإعدادات"
+    <!-- CONFIG API -->
+    <div id="config" class="tab-content" style="display:none; padding:10px;">
+        <div class="glass-card">
+            <h3 id="t-api-title">API CONFIG</h3>
+            <select><option>BINGX</option><option>OKX</option><option>BYBIT</option><option>BINANCE</option><option>BITGET</option><option>GATE IO</option><option>KUCOIN</option><option>KRAKEN</option><option>LBANK</option></select>
+            <input type="text" id="ph-api" placeholder="API KEY">
+            <input type="password" id="ph-sec" placeholder="SECRET KEY">
+            <input type="password" id="ph-pass" placeholder="PASSPHRASE">
+            <button id="btn-save" class="action-btn">SAVE</button>
+        </div>
+    </div>
+
+    <script>
+        const fullDict = {
+            fr: {
+                logTxt: "ACCÈS BLACKSNIPER", logBtn: "ENTRER", dash: "TABLEAU", macro: "MACRO", team: "ÉQUIPE", api: "RÉGLAGES",
+                engine: "● MOTEUR SMC V57 ACTIF", cap: "CAPITAL", pnl: "PNL EN DIRECT", panic: "🚨 VENTE PANIQUE",
+                teamT: "LEADERS DU SHIELD", faqT: "QUESTIONS FRÉQUENTES",
+                q1: "1. Comment activer ?", a1: "Allez dans l'onglet API pour lier vos clés d'échange.",
+                q2: "2. Sécurité ?", a2: "Accès protégé par le code PIN 197800 et cryptage local.",
+                apiT: "CONFIGURATION DES CLÉS", save: "ENREGISTRER", phApi: "CLÉ API", phSec: "CLÉ SECRÈTE", phPass: "MOT DE PASSE API"
+            },
+            en: {
+                logTxt: "BLACKSNIPER ACCESS", logBtn: "UNLOCK", dash: "DASH", macro: "MACRO", team: "TEAM", api: "CONFIG",
+                engine: "● SMC ENGINE V57 ACTIVE", cap: "CAPITAL", pnl: "LIVE PNL", panic: "🚨 PANIC SELL",
+                teamT: "SHIELD LEADERS", faqT: "FAQ",
+                q1: "1. How to activate?", a1: "Go to the API tab to link your exchange keys.",
+                q2: "2. Security?", a2: "Protected by PIN code 197800 and local encryption.",
+                apiT: "API KEY SETUP", save: "SAVE CONFIG", phApi: "API KEY", phSec: "SECRET KEY", phPass: "PASSPHRASE"
+            },
+            ar: {
+                logTxt: "دخول القناص الأسود", logBtn: "فتح", dash: "لوحة", macro: "ماكرو", team: "الفريق", api: "إعدادات",
+                engine: "● محرك SMC V57 نشط", cap: "رأس المال", pnl: "الأرباح المباشرة", panic: "🚨 بيع اضطراري",
+                teamT: "قادة الدرع", faqT: "الأسئلة الشائعة",
+                q1: "1. كيف يتم التفعيل؟", a1: "انتقل إلى علامة تبويب API لربط مفاتيح التبادل الخاصة بك.",
+                q2: "2. الأمان؟", a2: "محمي برمز PIN 197800 وتشفير محلي.",
+                apiT: "إعداد مفتاح API", save: "حفظ الإعدادات", phApi: "مفتاح API", phSec: "المفتاح السري", phPass: "عبارة المرور"
+            }
+        };
+
+        function checkLogin() { if(document.getElementById('pin-entry').value === "197800") document.getElementById('login-screen').style.display='none'; }
+        function setTab(id, el) { document.querySelectorAll('.tab-content').forEach(t => t.style.display='none'); document.getElementById(id).style.display='block'; document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
+        function tgF(el) { const a = el.nextElementSibling; a.style.display = a.style.display==='block' ? 'none' : 'block'; }
+
+        function applyFullTranslation() {
+            const l = document.getElementById('langSwitcher').value;
+            const d = fullDict[l] || fullDict['en'];
+            document.body.style.direction = (l === 'ar') ? 'rtl' : 'ltr';
+            
+            // Appliquer à CHAQUE ID de l'interface
+            document.getElementById('log-txt').innerText = d.logTxt;
+            document.getElementById('log-btn').innerText = d.logBtn;
+            document.getElementById('n-dash').innerText = d.dash;
+            document.getElementById('n-macro').innerText = d.macro;
+            document.getElementById('n-team').innerText = d.team;
+            document.getElementById('n-api').innerText = d.api;
+            document.getElementById('t-engine').innerText = d.engine;
+            document.getElementById('t-cap').innerText = d.cap;
+            document.getElementById('t-pnl').innerText = d.pnl;
+            document.getElementById('btn-panic').innerText = d.panic;
+            document.getElementById('t-team-title').innerText = d.teamT;
+            document.getElementById('t-faq-title').innerText = d.faqT;
+            document.getElementById('q1').innerText = d.q1; document.getElementById('a1').innerText = d.a1;
+            document.getElementById('q2').innerText = d.q2; document.getElementById('a2').innerText = d.a2;
+            document.getElementById('t-api-title').innerText = d.apiT;
+            document.getElementById('btn-save').innerText = d.save;
+            document.getElementById('ph-api').placeholder = d.phApi;
+            document.getElementById('ph-sec').placeholder = d.phSec;
+            document.getElementById('ph-pass').placeholder = d.phPass;
         }
-    };
 
-    function translatePage() {
-        const l = document.getElementById('langSwitcher').value;
-        const d = dictionary[l] || dictionary['en'];
-        
-        document.body.style.direction = (l === 'ar') ? 'rtl' : 'ltr';
-        
-        document.getElementById('nav-dash').innerText = d.navDash;
-        document.getElementById('nav-macro').innerText = d.navMacro;
-        document.getElementById('nav-team').innerText = d.navTeam;
-        document.getElementById('nav-config').innerText = d.navConfig;
-        document.getElementById('engine-status').innerText = d.engine;
-        document.getElementById('txt-balance').innerText = d.balance;
-        document.getElementById('txt-pnl').innerText = d.pnl;
-        document.getElementById('btn-panic').innerText = d.panic;
-        document.getElementById('team-title').innerText = d.team;
-        document.getElementById('faq-title').innerText = d.faq;
-        document.getElementById('q1').innerText = d.q1; document.getElementById('a1').innerText = d.a1;
-        document.getElementById('q2').innerText = d.q2; document.getElementById('a2').innerText = d.a2;
-        document.getElementById('q3').innerText = d.q3; document.getElementById('a3').innerText = d.a3;
-        document.getElementById('config-title').innerText = d.config;
-        document.getElementById('ph-api').placeholder = d.phApi;
-        document.getElementById('ph-secret').placeholder = d.phSecret;
-        document.getElementById('ph-pass').placeholder = d.phPass;
-        document.getElementById('btn-save').innerText = d.save;
-    }
-
-    function showTab(id, el) {
-        document.querySelectorAll('.tab-content').forEach(t => t.style.display='none');
-        document.getElementById(id).style.display='block';
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        el.classList.add('active');
-    }
-
-    function toggleFaq(el) {
-        const a = el.nextElementSibling;
-        a.style.display = (a.style.display === 'block') ? 'none' : 'block';
-    }
-</script>
+        setInterval(() => {
+            const logs = document.getElementById('radar-logs');
+            const items = ["BTC", "ETH", "SOL", "RWA", "GOLD"];
+            const item = items[Math.floor(Math.random()*items.length)];
+            const div = document.createElement('div');
+            div.innerHTML = `> [${new Date().toLocaleTimeString()}] SCANNING ${item}... <span style="color:var(--green)">LIQUIDITY OK</span>`;
+            logs.prepend(div);
+            if(logs.childNodes.length > 8) logs.lastChild.remove();
+        }, 3000);
+    </script>
 </body>
-                                                   </html>
-                                               
+</html>
+Dfe
