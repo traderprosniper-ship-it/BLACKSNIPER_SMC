@@ -1,100 +1,108 @@
 import ccxt
 import pandas as pd
+import time
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import requests
-import time
 import threading
 
 app = Flask(__name__)
 CORS(app)
 
-# --- CONFIGURATION SANGMELIMA SHIELD ---
-BOT_TOKEN = "7874803596:AAG94iaEWHZyuCJe5q0UyjTXqOu6MShG58Q"
-CHAT_ID = "6727767271"
-
-def notify_telegram(msg):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    try: requests.post(url, json={"chat_id": CHAT_ID, "text": f"🛡️ [IFDA SYSTEM]\n{msg}", "parse_mode": "Markdown"})
-    except: pass
-
-class IFDASniper:
+class BlackSniperEngine:
     def __init__(self, ex_id, ak, secret, passph=None):
         config = {
-            'apiKey': ak, 'secret': secret,
-            'enableRateLimit': True,
-            'options': {'defaultType': 'swap'} # Verrouillé sur PERPÉTUEL
+            'apiKey': ak, 
+            'secret': secret, 
+            'enableRateLimit': True, 
+            'options': {'defaultType': 'swap'}
         }
         if passph: config['password'] = passph
+        
+        # Initialisation de l'échangeur via CCXT
         self.ex = getattr(ccxt, ex_id.lower())(config)
+        self.is_running = False
+        self.symbol = "BTC/USDT"
+        self.amount_usdt = 10.0  # Mise de départ fixe pour accumuler le profit à côté
+        self.logs = []
+        self.pnl = 0.0
 
-    def get_pnl(self):
-        try:
-            balance = self.ex.fetch_balance()
-            # Récupération simplifiée du PNL non réalisé pour le Dashboard
-            pos = self.ex.fetch_positions()
-            pnl = sum(float(p['unrealizedPnl']) for p in pos if float(p['unrealizedPnl']) != 0)
-            total = balance['total']['USDT']
-            return total, pnl
-        except: return 0, 0
+    def add_log(self, msg):
+        log = f"[{time.strftime('%H:%M:%S')}] {msg}"
+        print(log) # Log dans la console Termux
+        self.logs.append(log)
+        if len(self.logs) > 30: self.logs.pop(0)
 
-    def analyze_m15_sweep(self, symbol):
-        try:
-            # Analyse Cascade M15
-            ohlcv = self.ex.fetch_ohlcv(symbol, timeframe='15m', limit=50)
-            df = pd.DataFrame(ohlcv, columns=['t', 'o', 'h', 'l', 'c', 'v'])
-            
-            cp = df['c'].iloc[-1]
-            pdh = df['h'].iloc[-30:-2].max() # Previous High
-            pdl = df['l'].iloc[-30:-2].min() # Previous Low
+    def analyze_and_trade(self):
+        """ BOUCLE DE TRADING AUTOMATIQUE SMC/CRT """
+        self.add_log(f"🚀 Bouclier activé sur {self.symbol}")
+        
+        while self.is_running:
+            try:
+                # Analyse sur 1h et 15m pour la précision Sniper
+                for tf in ['1h', '15m']:
+                    ohlcv = self.ex.fetch_ohlcv(self.symbol, timeframe=tf, limit=5)
+                    df = pd.DataFrame(ohlcv, columns=['t', 'o', 'h', 'l', 'c', 'v'])
+                    
+                    # Définition des bougies B1 (Range) et B2 (Sweep)
+                    b1_h, b1_l = df['h'].iloc[-3], df['l'].iloc[-3]
+                    b2_h, b2_l, b2_c = df['h'].iloc[-2], df['l'].iloc[-2], df['c'].iloc[-2]
 
-            # Logique de Sweep SMC
-            if df['h'].iloc[-1] > pdh and cp < pdh: # Sweep Haut + Réintégration
-                return 'sell', df['h'].iloc[-1], pdl
-            if df['l'].iloc[-1] < pdl and cp > pdl: # Sweep Bas + Réintégration
-                return 'buy', df['l'].iloc[-1], pdh
-            return None, 0, 0
-        except: return None, 0, 0
+                    side = None
+                    # LOGIQUE CRT : SWEEP + RÉINTÉGRATION
+                    if b2_h > b1_h and b2_c < b1_h: side = 'sell' # Short
+                    if b2_l < b1_l and b2_c > b1_l: side = 'buy'  # Long
 
-# --- ROUTES API POUR LE DASHBOARD OBSIDIAN ---
+                    if side:
+                        self.add_log(f"🎯 SIGNAL {side.upper()} DÉTECTÉ ({tf})")
+                        
+                        # Prix actuel pour calculer la taille de la position
+                        ticker = self.ex.fetch_ticker(self.symbol)
+                        price = ticker['last']
+                        amount_crypto = self.amount_usdt / price
+                        
+                        # EXECUTION DE L'ORDRE RÉEL
+                        self.ex.create_market_order(self.symbol, side, amount_crypto)
+                        self.add_log(f"✅ ORDRE PLACÉ : {self.amount_usdt}$ utilisé. Profits accumulés.")
+                        
+                        # Pause de sécurité après trade (10 min)
+                        time.sleep(600) 
+                
+                time.sleep(30) # Scan toutes les 30 secondes
+            except Exception as e:
+                self.add_log(f"⚠️ Erreur Marché : {str(e)}")
+                time.sleep(15)
 
-@app.route('/status', methods=['POST'])
+# Instance globale du moteur
+engine = None
+
+@app.route('/toggle_bot', methods=['POST'])
+def toggle_bot():
+    global engine
+    data = request.json
+    
+    if not engine:
+        engine = BlackSniperEngine(data['exchange'], data['ak'], data['as'], data.get('passphrase'))
+    
+    if data.get('action') == 'start':
+        engine.amount_usdt = float(data.get('qty', 10))
+        engine.is_running = True
+        threading.Thread(target=engine.analyze_and_trade).start()
+        return jsonify({"status": "RUNNING"})
+    else:
+        engine.is_running = False
+        return jsonify({"status": "STOPPED"})
+
+@app.route('/get_status', methods=['GET'])
 def get_status():
-    data = request.json
-    try:
-        bot = IFDASniper(data['exchange'], data['ak'], data['as'], data.get('passphrase'))
-        balance, pnl = bot.get_pnl()
-        return jsonify({"status": "OK", "balance": balance, "pnl": pnl})
-    except Exception as e:
-        return jsonify({"status": "ERROR", "message": str(e)})
-
-@app.route('/execute', methods=['POST'])
-def execute_trade():
-    data = request.json
-    try:
-        bot = IFDASniper(data['exchange'], data['ak'], data['as'], data.get('passphrase'))
-        symbol = data.get('symbol', 'BTC/USDT')
-        
-        # Commande Panic Sell
-        if data.get('action') == "PANIC_SELL":
-            bot.ex.cancel_all_orders(symbol)
-            # Logique pour fermer les positions market ici
-            notify_telegram(f"🚨 *URGENCE* : Toutes les positions sur {symbol} ont été fermées !")
-            return jsonify({"status": "success", "message": "Positions fermées"})
-
-        side, sl, tp = bot.analyze_m15_sweep(symbol)
-        if side:
-            # Calcul lot min pour capital de précision
-            qty = float(data.get('capital', 10)) / bot.ex.fetch_ticker(symbol)['last']
-            bot.ex.create_market_order(symbol, side, qty)
-            notify_telegram(f"🎯 *INJECTION RÉUSSIE*\n{symbol} : {side.upper()}\nPNL attendu sur Sweep M15.")
-            return jsonify({"status": "success", "trade": {"side": side, "price": "Market"}})
-        
-        return jsonify({"status": "scanning", "message": "Recherche de liquidité en cours..."})
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
+    if engine:
+        return jsonify({
+            "logs": engine.logs, 
+            "pnl": engine.pnl, 
+            "running": engine.is_running
+        })
+    return jsonify({"logs": ["En attente de lancement..."], "pnl": 0, "running": False})
 
 if __name__ == '__main__':
-    print("🚀 IFDA MASTER GLOBAL V57 - READY")
+    # Lancement du serveur sur le port 5000
     app.run(host='0.0.0.0', port=5000)
-          
+            
