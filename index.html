@@ -8,7 +8,6 @@
         :root { --bg: #05070a; --neon: #00f2ff; --gold: #ffc107; --text: #f8fafc; --red: #ff3333; --green: #00ff88; --border: rgba(255, 255, 255, 0.1); }
         body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; }
         
-        /* LOGO 3D TOURNANT */
         #bg-logo { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 280px; height: 280px; opacity: 0.08; z-index: -1; animation: orbit 20s linear infinite; }
         @keyframes orbit { from { transform: translate(-50%, -50%) rotateY(0deg); } to { transform: translate(-50%, -50%) rotateY(360deg); } }
 
@@ -25,6 +24,7 @@
         
         input, select, textarea { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; margin-top: 8px; box-sizing: border-box; font-size: 13px; }
         .member-line { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
+        .news-item { padding: 10px; border-left: 2px solid var(--gold); background: rgba(255,193,7,0.05); margin-bottom: 8px; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -40,72 +40,86 @@
     </div>
 
     <div class="content-area">
-        <!-- MODE RÉEL CRT -->
+        <!-- DASHBOARD : LIÉ AU MOTEUR PYTHON -->
         <div id="dash" class="tab-content">
             <div class="glass-card">
                 <span id="st-tag" style="color:var(--green); font-size:10px;">● CRT ENGINE LIVE - REAL MODE</span>
                 <div style="display:flex; justify-content:space-around; margin:20px 0; text-align:center;">
-                    <div><small id="t-cap">CAPITAL</small><div id="display-cap" style="font-size:22px; color:var(--gold); font-weight:bold;">$25</div></div>
-                    <div><small id="t-pnl">PNL LIVE</small><div id="live-pnl" style="font-size:22px; color:var(--green); font-weight:bold;">+$0.00</div></div>
+                    <div><small id="t-cap">CAPITAL ALLOUÉ</small><div id="display-cap" style="font-size:22px; color:var(--gold); font-weight:bold;">$0.00</div></div>
+                    <div><small id="t-pnl">PNL LIVE (PYTHON)</small><div id="live-pnl" style="font-size:22px; color:var(--green); font-weight:bold;">+$0.00</div></div>
                 </div>
                 <div id="realtime-monitor" style="background:#000; height:150px; border-radius:10px; padding:10px; font-family:monospace; font-size:10px; color:var(--neon); overflow-y:auto; border: 1px solid var(--border);">
-                    <div id="logs">> SCANNING 9+ EXCHANGES FOR CRT RANGE-SWEEP-DIST...</div>
+                    <div id="logs">> WAITING FOR PYTHON ENGINE...</div>
                 </div>
             </div>
             <button id="btn-panic" onclick="panicSell()" style="width:100%; padding:16px; background:var(--red); border:none; border-radius:12px; color:white; font-weight:bold;">🚨 PANIC SELL</button>
         </div>
 
-        <!-- GATEWAY : PASSPHRASE + ASSETS (RWA/DEPIN) -->
+        <!-- AUTO GATEWAY : CONFIGURATION QUANTITÉ -->
         <div id="config" class="tab-content" style="display:none;">
             <div class="glass-card">
                 <h3 id="t-config" style="color:var(--gold); margin-top:0;">AUTONOMOUS GATEWAY</h3>
-                <label id="l-ex">ÉCHANGEUR</label>
+                <label>QUANTITÉ À UTILISER ($)</label>
+                <input type="number" id="trade-qty" placeholder="Ex: 25" style="border: 1px solid var(--neon); font-size: 18px; color: var(--neon);">
+                
+                <label id="l-ex" style="margin-top:15px; display:block;">ÉCHANGEUR</label>
                 <select id="ex-id">
-                    <option value="binance">Binance</option><option value="bingx">BingX</option>
-                    <option value="mexc" selected>MEXC</option><option value="bybit">Bybit</option>
-                    <option value="kraken">Kraken</option><option value="okx">OKX</option>
-                    <option value="gateio">Gate.io</option><option value="kucoin">KuCoin</option>
-                    <option value="deriv">Deriv</option><option value="exness">Exness</option>
+                    <option value="mexc" selected>MEXC</option><option value="bingx" selected>BINGX</option><option value="gate io" selected>GATE IO</option><option value="binance">Binance</option>
+                    <option value="bybit">Bybit</option><option value="okx">OKX</option>
+                    <option value="exness">Exness</option>
                 </select>
                 <input type="text" id="ph-api" placeholder="API KEY">
                 <input type="password" id="i-sec" placeholder="SECRET KEY">
-                <input type="password" id="ph-pass" placeholder="PASSPHRASE">
                 
-                <label id="l-assets" style="margin-top:15px; display:block;">CATÉGORIES D'ACTIFS</label>
+                <label style="margin-top:15px; display:block;">MODE DE TRADING</label>
                 <select id="asset-type">
+                    <option value="perp">Crypto Perpetuals</option>
                     <option value="rwa">Real World Assets (RWA)</option>
                     <option value="depin">DePIN Network</option>
-                    <option value="perp">Crypto Perpetuals</option>
                 </select>
-                <button id="b-save" style="width:100%; padding:16px; background:#3b82f6; border:none; border-radius:12px; color:white; font-weight:bold; margin-top:15px;">ACTIVATE SHIELD</button>
+                <button id="b-save" onclick="updateCapital()" style="width:100%; padding:16px; background:#3b82f6; border:none; border-radius:12px; color:white; font-weight:bold; margin-top:15px;">ACTIVATE SHIELD</button>
             </div>
         </div>
 
-        <!-- TEAM 8 MEMBRES -->
-        <div id="team" class="tab-content" style="display:none;">
+        <!-- MACRO NEWS (INVESTING.COM STYLE) -->
+        <div id="macro" class="tab-content" style="display:none;">
             <div class="glass-card">
-                <h3 id="t-team" style="color:var(--gold);">SANGMELIMA SHIELD TEAM</h3>
-                <div id="team-list">
-                    <div class="member-line"><span>Albert (Togo)</span><span style="color:var(--neon);">LEADER</span></div>
-                    <div class="member-line"><span>Marie (Guadeloupe)</span><span style="color:var(--neon);">ANALYSIS</span></div>
-                    <div class="member-line"><span>Sébastien (Benin)</span><span style="color:var(--neon);">COACH</span></div>
-                    <div class="member-line"><span>Bertrand (Douala)</span><span style="color:var(--neon);">TECH</span></div>
-                    <div class="member-line"><span>Leader 5</span><span>TRADER</span></div>
-                    <div class="member-line"><span>Leader 6</span><span>TRADER</span></div>
-                    <div class="member-line"><span>Leader 7</span><span>RWA SPECIALIST</span></div>
-                    <div class="member-line"><span>Leader 8</span><span>SECURITY</span></div>
+                <h3 style="color:var(--gold); margin-top:0;">MACRO ECONOMIC NEWS</h3>
+                <div id="news-feed">
+                    <div class="news-item"><b>USD:</b> Core Retail Sales m/m <span style="color:var(--red);">High Impact</span></div>
+                    <div class="news-item"><b>EUR:</b> ECB President Lagarde Speaks <span style="color:var(--gold);">Medium Impact</span></div>
+                    <div class="news-item"><b>BTC:</b> Exchange Inflow Spike detected <span style="color:var(--neon);">Alert</span></div>
                 </div>
             </div>
         </div>
 
-        <!-- FAQ & INSCRIPTION CRT -->
+        <!-- TEAM SANGMELIMA SHIELD (8 MEMBRES) -->
+        <div id="team" class="tab-content" style="display:none;">
+            <div class="glass-card">
+                <h3 id="t-team" style="color:var(--gold);">SANGMELIMA SHIELD TEAM</h3>
+                <div id="team-list">
+                    <div class="member-line"><span>Nasser (Moi)</span><span style="color:var(--neon);">DÉVELOPPEUR CHEF</span></div>
+                    <div class="member-line"><span>Bertrand</span><span style="color:var(--neon);">TECH & SERVEUR</span></div>
+                    <div class="member-line"><span>Sébastien</span><span style="color:var(--neon);">COACH SMC</span></div>
+                    <div class="member-line"><span>Franco</span><span style="color:var(--neon);">STRATÉGIE CRT</span></div>
+                    <div class="member-line"><span>Albert</span><span style="color:var(--neon);">LEADER RÉSEAU</span></div>
+                    <div class="member-line"><span>Eva</span><span style="color:var(--neon);">GESTION RWA</span></div>
+                    <div class="member-line"><span>Béatrice</span><span style="color:var(--neon);">ANALYSTE MACRO</span></div>
+                    <div class="member-line"><span>Marie</span><span style="color:var(--neon);">COMMUNITY MGMT</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ & REGISTRATION -->
         <div id="faq" class="tab-content" style="display:none;">
             <div class="glass-card">
-                <h3 id="t-faq" style="color:var(--gold);">CRT STRATEGY & REGISTRATION</h3>
-                <div style="font-size:11px; line-height:1.6; color:var(--text);">
-                    <b>1. Anatomie CRT :</b> Analyse Bougie 1 (Range), Bougie 2 (Sweep), Bougie 3 (Distribution).<br>
-                    <b>2. Inscription :</b> Formulaire membre actif requis pour le mode réel.<br>
-                    <b>3. News Macro :</b> Suivi des impacts économiques haute importance.
+                <h3 id="t-faq" style="color:var(--gold);">CRT REGISTRATION</h3>
+                <div style="font-size:12px; line-height:1.6; color:var(--text); text-align: center;">
+                    <div style="background: rgba(0,255,136,0.1); padding: 15px; border-radius: 10px; border: 1px dashed var(--green);">
+                        <b style="color:var(--green); font-size:14px;">DÉPÔT MINIMUM : 10$</b><br>
+                        Accès complet au robot et aux signaux Sniper.
+                    </div>
+                    <p style="margin-top:15px; text-align: left;">1. Analyse CRT (Range-Sweep-Dist).<br>2. Liaison API sécurisée.<br>3. Monitoring 24/7 via Python Engine.</p>
                 </div>
             </div>
         </div>
@@ -121,24 +135,18 @@
 
     <script>
         const translations = {
-            fr: { dash: "TABLEAU", auto: "AUTO", news: "NEWS", team: "ÉQUIPE", faq: "FAQ", panic: "🚨 VENTE DE PANIQUE", cap: "CAPITAL", ex_label: "ÉCHANGEUR", st_real: "● MODE RÉEL CRT ACTIF" },
-            en: { dash: "DASH", auto: "AUTO", news: "NEWS", team: "TEAM", faq: "FAQ", panic: "🚨 PANIC SELL", cap: "CAPITAL", ex_label: "EXCHANGE", st_real: "● REAL CRT MODE ACTIVE" },
-            ar: { dash: "لوحة التحكم", auto: "تلقائي", news: "أخبار", team: "الفريق", faq: "الأسئلة", panic: "🚨 بيع اضطراري", cap: "رأس المال", ex_label: "المنصة", st_real: "● وضع CRT الحقيقي نشط" }
+            fr: { dash: "TABLEAU", auto: "AUTO", news: "NEWS", team: "ÉQUIPE", faq: "FAQ", panic: "🚨 VENTE DE PANIQUE", cap: "CAPITAL", ex_label: "ÉCHANGEUR", st_real: "● MODE RÉEL CRT ACTIF" }
         };
 
-        function translateEverything() {
-            const lang = document.getElementById('langSwitcher').value;
-            const t = translations[lang] || translations['fr'];
-            document.body.style.direction = (lang === 'ar') ? 'rtl' : 'ltr';
-            document.getElementById('nav-dash').innerText = t.dash;
-            document.getElementById('nav-config').innerText = t.auto;
-            document.getElementById('nav-macro').innerText = t.news;
-            document.getElementById('nav-team').innerText = t.team;
-            document.getElementById('nav-faq').innerText = t.faq;
-            document.getElementById('btn-panic').innerText = t.panic;
-            document.getElementById('t-cap').innerText = t.cap;
-            document.getElementById('l-ex').innerText = t.ex_label;
-            document.getElementById('st-tag').innerText = t.st_real;
+        function updateCapital() {
+            const qty = document.getElementById('trade-qty').value;
+            if(qty >= 10) {
+                document.getElementById('display-cap').innerText = '$' + qty;
+                alert("Shield Activé : Le robot utilisera " + qty + "$ sur le marché.");
+                setTab('dash', document.getElementById('nav-dash'));
+            } else {
+                alert("Erreur : Le montant minimum est de 10$");
+            }
         }
 
         function setTab(id, el) { 
@@ -147,8 +155,17 @@
             document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); 
             el.classList.add('active'); 
         }
+        
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+        
+        // Simulation de réception de données Python
+        function updateFromPython(pnl, logMessage) {
+            document.getElementById('live-pnl').innerText = pnl;
+            const logDiv = document.getElementById('logs');
+            logDiv.innerHTML += `<div>> ${logMessage}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
     </script>
 </body>
-                    </html>
-                        
+    </html>
+                                                                                                                        
