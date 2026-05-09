@@ -8,12 +8,15 @@
         :root { --bg: #05070a; --neon: #00f2ff; --gold: #ffc107; --text: #f8fafc; --red: #ff3333; --green: #00ff88; --border: rgba(255, 255, 255, 0.1); }
         body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; }
         
+        #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(20px); }
+        .lock-box { background: rgba(15, 20, 28, 0.95); padding: 30px; border-radius: 20px; border: 1px solid var(--neon); text-align: center; width: 80%; max-width: 300px; box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); }
+        .key-input { width: 100%; padding: 15px; background: #000; border: 1px solid var(--neon); border-radius: 10px; color: var(--neon); text-align: center; font-size: 24px; letter-spacing: 5px; margin-top: 20px; outline: none; }
+
         #bg-logo { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 280px; height: 280px; opacity: 0.08; z-index: -1; animation: orbit 20s linear infinite; }
         @keyframes orbit { from { transform: translate(-50%, -50%) rotateY(0deg); } to { transform: translate(-50%, -50%) rotateY(360deg); } }
 
         .top-status-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--border); }
         #clock { color: var(--gold); font-family: monospace; font-size: 14px; font-weight: bold; }
-        .lang-select { background: #000; color: var(--neon); border: 1px solid var(--neon); padding: 5px; border-radius: 6px; font-size: 10px; font-weight: bold; outline: none; }
 
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(15, 20, 28, 0.98); display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--border); z-index: 5000; padding-bottom: env(safe-area-inset-bottom); }
         .nav-item { padding: 18px 2px; font-size: 8px; font-weight: bold; text-align: center; cursor: pointer; color: #64748b; text-transform: uppercase; }
@@ -22,131 +25,116 @@
         .content-area { height: calc(100vh - 120px); overflow-y: auto; padding: 10px; padding-bottom: 80px; }
         .glass-card { background: rgba(15, 20, 28, 0.9); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
         
-        input, select, textarea { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; margin-top: 8px; box-sizing: border-box; font-size: 13px; }
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; margin-top: 8px; box-sizing: border-box; font-size: 13px; }
         .member-line { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
-        .news-item { padding: 10px; border-left: 2px solid var(--gold); background: rgba(255,193,7,0.05); margin-bottom: 8px; font-size: 11px; }
     </style>
 </head>
 <body>
 
-    <div id="bg-logo"><img src="logo_3d.png" alt="CRT LOGO" style="width:100%;"></div>
-
-    <div class="top-status-bar">
-        <div id="clock">00:00:00</div>
-        <select id="langSwitcher" class="lang-select" onchange="translateEverything()">
-            <option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option>
-            <option value="es">🇪🇸 ES</option><option value="de">🇩🇪 DE</option><option value="ar">🇸🇦 AR</option>
-        </select>
+    <div id="lock-screen">
+        <div class="lock-box">
+            <div style="color: var(--gold); font-size: 14px; font-weight: bold;">SANGMELIMA SHIELD</div>
+            <input type="password" id="master-key" class="key-input" placeholder="••••••" maxlength="6">
+            <button onclick="checkKey()" style="width: 100%; margin-top: 15px; padding: 12px; background: var(--neon); border: none; border-radius: 8px; color: #000; font-weight: bold;">ACCÈS RÉEL</button>
+        </div>
     </div>
 
-    <div class="content-area">
-        <!-- DASHBOARD : LIÉ AU MOTEUR PYTHON -->
-        <div id="dash" class="tab-content">
-            <div class="glass-card">
-                <span id="st-tag" style="color:var(--green); font-size:10px;">● CRT ENGINE LIVE - REAL MODE</span>
-                <div style="display:flex; justify-content:space-around; margin:20px 0; text-align:center;">
-                    <div><small id="t-cap">CAPITAL ALLOUÉ</small><div id="display-cap" style="font-size:22px; color:var(--gold); font-weight:bold;">$0.00</div></div>
-                    <div><small id="t-pnl">PNL LIVE (PYTHON)</small><div id="live-pnl" style="font-size:22px; color:var(--green); font-weight:bold;">+$0.00</div></div>
-                </div>
-                <div id="realtime-monitor" style="background:#000; height:150px; border-radius:10px; padding:10px; font-family:monospace; font-size:10px; color:var(--neon); overflow-y:auto; border: 1px solid var(--border);">
-                    <div id="logs">> WAITING FOR PYTHON ENGINE...</div>
-                </div>
-            </div>
-            <button id="btn-panic" onclick="panicSell()" style="width:100%; padding:16px; background:var(--red); border:none; border-radius:12px; color:white; font-weight:bold;">🚨 PANIC SELL</button>
-        </div>
+    <div id="main-app" style="display:none;">
+        <div id="bg-logo"><img src="logo_3d.png" alt="LOGO" style="width:100%;"></div>
+        <div class="top-status-bar"><div id="clock">00:00:00</div><div style="font-size: 10px; color: var(--neon);">BLACKSNIPER v3.5</div></div>
 
-        <!-- AUTO GATEWAY : CONFIGURATION QUANTITÉ -->
-        <div id="config" class="tab-content" style="display:none;">
-            <div class="glass-card">
-                <h3 id="t-config" style="color:var(--gold); margin-top:0;">AUTONOMOUS GATEWAY</h3>
-                <label>QUANTITÉ À UTILISER ($)</label>
-                <input type="number" id="trade-qty" placeholder="Ex: 25" style="border: 1px solid var(--neon); font-size: 18px; color: var(--neon);">
-                
-                <label id="l-ex" style="margin-top:15px; display:block;">ÉCHANGEUR</label>
-                <select id="ex-id">
-                    <option value="mexc" selected>MEXC</option><option value="bingx" selected>BINGX</option><option value="gate io" selected>GATE IO</option><option value="binance">Binance</option>
-                    <option value="bybit">Bybit</option><option value="okx">OKX</option>
-                    <option value="exness">Exness</option>
-                </select>
-                <input type="text" id="ph-api" placeholder="API KEY">
-                <input type="password" id="i-sec" placeholder="SECRET KEY">
-                
-                <label style="margin-top:15px; display:block;">MODE DE TRADING</label>
-                <select id="asset-type">
-                    <option value="perp">Crypto Perpetuals</option>
-                    <option value="rwa">Real World Assets (RWA)</option>
-                    <option value="depin">DePIN Network</option>
-                </select>
-                <button id="b-save" onclick="updateCapital()" style="width:100%; padding:16px; background:#3b82f6; border:none; border-radius:12px; color:white; font-weight:bold; margin-top:15px;">ACTIVATE SHIELD</button>
-            </div>
-        </div>
-
-        <!-- MACRO NEWS (INVESTING.COM STYLE) -->
-        <div id="macro" class="tab-content" style="display:none;">
-            <div class="glass-card">
-                <h3 style="color:var(--gold); margin-top:0;">MACRO ECONOMIC NEWS</h3>
-                <div id="news-feed">
-                    <div class="news-item"><b>USD:</b> Core Retail Sales m/m <span style="color:var(--red);">High Impact</span></div>
-                    <div class="news-item"><b>EUR:</b> ECB President Lagarde Speaks <span style="color:var(--gold);">Medium Impact</span></div>
-                    <div class="news-item"><b>BTC:</b> Exchange Inflow Spike detected <span style="color:var(--neon);">Alert</span></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TEAM SANGMELIMA SHIELD (8 MEMBRES) -->
-        <div id="team" class="tab-content" style="display:none;">
-            <div class="glass-card">
-                <h3 id="t-team" style="color:var(--gold);">SANGMELIMA SHIELD TEAM</h3>
-                <div id="team-list">
-                    <div class="member-line"><span>Nasser (Moi)</span><span style="color:var(--neon);">DÉVELOPPEUR CHEF</span></div>
-                    <div class="member-line"><span>Bertrand</span><span style="color:var(--neon);">TECH & SERVEUR</span></div>
-                    <div class="member-line"><span>Sébastien</span><span style="color:var(--neon);">COACH SMC</span></div>
-                    <div class="member-line"><span>Franco</span><span style="color:var(--neon);">STRATÉGIE CRT</span></div>
-                    <div class="member-line"><span>Albert</span><span style="color:var(--neon);">LEADER RÉSEAU</span></div>
-                    <div class="member-line"><span>Eva</span><span style="color:var(--neon);">GESTION RWA</span></div>
-                    <div class="member-line"><span>Béatrice</span><span style="color:var(--neon);">ANALYSTE MACRO</span></div>
-                    <div class="member-line"><span>Marie</span><span style="color:var(--neon);">COMMUNITY MGMT</span></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- FAQ & REGISTRATION -->
-        <div id="faq" class="tab-content" style="display:none;">
-            <div class="glass-card">
-                <h3 id="t-faq" style="color:var(--gold);">CRT REGISTRATION</h3>
-                <div style="font-size:12px; line-height:1.6; color:var(--text); text-align: center;">
-                    <div style="background: rgba(0,255,136,0.1); padding: 15px; border-radius: 10px; border: 1px dashed var(--green);">
-                        <b style="color:var(--green); font-size:14px;">DÉPÔT MINIMUM : 10$</b><br>
-                        Accès complet au robot et aux signaux Sniper.
+        <div class="content-area">
+            <div id="dash" class="tab-content">
+                <div class="glass-card">
+                    <span id="engine-status" style="color:var(--red); font-size:10px;">● ENGINE DISCONNECTED</span>
+                    <div style="display:flex; justify-content:space-around; margin:20px 0; text-align:center;">
+                        <div><small>MISE FIXE</small><div id="display-cap" style="font-size:22px; color:var(--gold); font-weight:bold;">$0.00</div></div>
+                        <div><small>PNL ACCUMULÉ</small><div id="live-pnl" style="font-size:22px; color:var(--green); font-weight:bold;">0.00%</div></div>
                     </div>
-                    <p style="margin-top:15px; text-align: left;">1. Analyse CRT (Range-Sweep-Dist).<br>2. Liaison API sécurisée.<br>3. Monitoring 24/7 via Python Engine.</p>
+                    <div id="realtime-monitor" style="background:#000; height:130px; border-radius:10px; padding:10px; font-family:monospace; font-size:10px; color:var(--neon); overflow-y:auto; border: 1px solid var(--border);">
+                        <div id="logs">> Prêt pour le scan...</div>
+                    </div>
+                </div>
+                <button onclick="stopBot()" style="width:100%; padding:16px; background:var(--red); border:none; border-radius:12px; color:white; font-weight:bold;">🚨 PANIC STOP</button>
+            </div>
+
+            <div id="config" class="tab-content" style="display:none;">
+                <div class="glass-card">
+                    <h3 style="color:var(--gold); margin-top:0;">CONFIGURATION</h3>
+                    <input type="number" id="trade-qty" placeholder="Quantité USDT (Ex: 25)">
+                    <select id="ex-id" onchange="toggleP()"><option value="mexc">MEXC</option><option value="okx">OKX</option><option value="bingx">BingX</option></select>
+                    <input type="text" id="api-key" placeholder="API KEY">
+                    <input type="password" id="api-secret" placeholder="API SECRET">
+                    <div id="p-f" style="display:none;"><input type="password" id="api-pass" placeholder="PASSPHRASE"></div>
+                    <button onclick="runBot()" style="width:100%; padding:16px; background:var(--green); border:none; border-radius:12px; color:#000; font-weight:bold; margin-top:15px;">DÉMARRER LE SNIPER</button>
+                </div>
+            </div>
+
+            <div id="macro" class="tab-content" style="display:none;">
+                <div class="glass-card" style="height: 400px; padding: 0; overflow: hidden;">
+                    <iframe src="https://sslecal2.investing.com?importance=2,3&countries=5&timeZone=58&lang=5" width="100%" height="100%" frameborder="0"></iframe>
+                </div>
+            </div>
+
+            <div id="team" class="tab-content" style="display:none;">
+                <div class="glass-card">
+                    <h3 style="color:var(--gold); margin-top:0;">CORE TEAM</h3>
+                    <div class="member-line"><span>Nasser</span><span style="color:var(--neon);">DEV</span></div>
+                    <div class="member-line"><span>Bertrand</span><span style="color:var(--neon);">TECH</span></div>
+                    <div class="member-line"><span>Sébastien</span><span style="color:var(--neon);">COACH</span></div>
+                    <div class="member-line"><span>Franco</span><span style="color:var(--neon);">STRAT</span></div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="nav-bar">
-        <div id="nav-dash" class="nav-item active" onclick="setTab('dash', this)">DASH</div>
-        <div id="nav-config" class="nav-item" onclick="setTab('config', this)">AUTO</div>
-        <div id="nav-macro" class="nav-item" onclick="setTab('macro', this)">NEWS</div>
-        <div id="nav-team" class="nav-item" onclick="setTab('team', this)">TEAM</div>
-        <div id="nav-faq" class="nav-item" onclick="setTab('faq', this)">FAQ</div>
+        <div class="nav-bar">
+            <div class="nav-item active" onclick="setTab('dash', this)">DASH</div>
+            <div class="nav-item" onclick="setTab('config', this)">AUTO</div>
+            <div class="nav-item" onclick="setTab('macro', this)">NEWS</div>
+            <div class="nav-item" onclick="setTab('team', this)">TEAM</div>
+            <div class="nav-item" onclick="setTab('faq', this)">REG</div>
+        </div>
     </div>
 
     <script>
-        const translations = {
-            fr: { dash: "TABLEAU", auto: "AUTO", news: "NEWS", team: "ÉQUIPE", faq: "FAQ", panic: "🚨 VENTE DE PANIQUE", cap: "CAPITAL", ex_label: "ÉCHANGEUR", st_real: "● MODE RÉEL CRT ACTIF" }
-        };
+        const API_URL = "http://localhost:5000"; // Modifie par ton IP si besoin
 
-        function updateCapital() {
-            const qty = document.getElementById('trade-qty').value;
-            if(qty >= 10) {
-                document.getElementById('display-cap').innerText = '$' + qty;
-                alert("Shield Activé : Le robot utilisera " + qty + "$ sur le marché.");
-                setTab('dash', document.getElementById('nav-dash'));
-            } else {
-                alert("Erreur : Le montant minimum est de 10$");
+        function checkKey() {
+            if(document.getElementById('master-key').value === "197800") {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
             }
+        }
+
+        function toggleP() {
+            const ex = document.getElementById('ex-id').value;
+            document.getElementById('p-f').style.display = (ex==='okx') ? 'block' : 'none';
+        }
+
+        function runBot() {
+            const data = {
+                action: 'start',
+                exchange: document.getElementById('ex-id').value,
+                ak: document.getElementById('api-key').value,
+                as: document.getElementById('api-secret').value,
+                passphrase: document.getElementById('api-pass').value,
+                qty: document.getElementById('trade-qty').value
+            };
+            fetch(`${API_URL}/toggle_bot`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) })
+            .then(() => {
+                document.getElementById('engine-status').style.color = "var(--green)";
+                document.getElementById('engine-status').innerText = "● ENGINE ACTIVE";
+                document.getElementById('display-cap').innerText = "$" + data.qty;
+                setTab('dash', document.querySelector('.nav-item'));
+                setInterval(sync, 3000);
+            });
+        }
+
+        function sync() {
+            fetch(`${API_URL}/get_status`).then(res => res.json()).then(data => {
+                document.getElementById('logs').innerHTML = data.logs.map(l => `<div>> ${l}</div>`).join('');
+                document.getElementById('live-pnl').innerText = data.pnl.toFixed(2) + "%";
+            });
         }
 
         function setTab(id, el) { 
@@ -155,17 +143,8 @@
             document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); 
             el.classList.add('active'); 
         }
-        
+
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
-        
-        // Simulation de réception de données Python
-        function updateFromPython(pnl, logMessage) {
-            document.getElementById('live-pnl').innerText = pnl;
-            const logDiv = document.getElementById('logs');
-            logDiv.innerHTML += `<div>> ${logMessage}</div>`;
-            logDiv.scrollTop = logDiv.scrollHeight;
-        }
     </script>
 </body>
-    </html>
-                                                                                                                        
+</html>
