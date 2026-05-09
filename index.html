@@ -8,7 +8,6 @@
         :root { --bg: #05070a; --neon: #00f2ff; --gold: #ffc107; --text: #f8fafc; --red: #ff3333; --green: #00ff88; --border: rgba(255, 255, 255, 0.1); }
         body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; }
         
-        /* AJUSTEMENT BARRE DE STATUT (HORLOGE + LANGUE) */
         .top-status-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--border); }
         #clock { color: var(--gold); font-family: monospace; font-size: 14px; font-weight: bold; }
         .lang-select { background: #000; color: var(--neon); border: 1px solid var(--neon); padding: 5px; border-radius: 6px; font-size: 10px; font-weight: bold; outline: none; }
@@ -25,12 +24,8 @@
         #realtime-monitor { background: #000; border-radius: 12px; padding: 15px; height: 180px; font-family: 'Courier New', monospace; font-size: 10px; color: var(--neon); overflow-y: auto; border: 1px solid var(--border); }
         
         input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; margin-top: 8px; box-sizing: border-box; }
-        .member-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
-        .faq-q { padding: 12px; cursor: pointer; font-size: 11px; font-weight: bold; background: rgba(255,255,255,0.02); border-radius: 8px; margin-top: 5px; }
-        .faq-a { display: none; padding: 12px; font-size: 10px; color: #aaa; }
-        
-        /* Style pour le badge du budget trading */
         .budget-badge { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--neon); color: var(--neon); padding: 4px 8px; border-radius: 5px; font-size: 10px; margin-top: 5px; display: inline-block; }
+        .member-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
     </style>
 </head>
 <body>
@@ -44,7 +39,7 @@
     <div class="top-status-bar">
         <div id="clock">00:00:00</div>
         <select id="langSwitcher" class="lang-select" onchange="translateEverything()">
-            <option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option><option value="es">🇪🇸 ES</option><option value="de">🇩🇪 DE</option><option value="ar">🇸🇦 AR</option>
+            <option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option><option value="ar">🇸🇦 AR</option>
         </select>
     </div>
 
@@ -53,15 +48,15 @@
             <div class="glass-card">
                 <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:15px;">
                     <span id="st-tag" style="color:var(--red);">● ENGINE OFFLINE</span>
-                    <div id="trading-limit-display" class="budget-badge">LIMIT: $0.00</div>
+                    <div id="trading-limit-display" class="budget-badge">LIMIT: $25.00</div>
                 </div>
                 <div style="display:flex; justify-content:space-around; margin-bottom:20px; text-align:center;">
-                    <div><small id="t-cap">CAPITAL</small><div id="display-cap" style="font-size:22px; color:var(--gold); font-weight:bold;">$0.00</div></div>
+                    <div><small id="t-cap">CAPITAL</small><div id="display-cap" style="font-size:22px; color:var(--gold); font-weight:bold;">$25.00</div></div>
                     <div><small id="t-pnl">PNL LIVE</small><div id="live-pnl" style="font-size:22px; color:var(--green); font-weight:bold;">+$0.00</div></div>
                 </div>
-                <div id="realtime-monitor"><div id="logs">> WAITING FOR SERVER...</div></div>
+                <div id="realtime-monitor"><div id="logs">> WAITING FOR ENGINE...</div></div>
             </div>
-            <button id="b-panic" style="width:100%; padding:16px; background:var(--red); border:none; border-radius:12px; color:white; font-weight:bold;">🚨 PANIC SELL</button>
+            <button id="b-panic" onclick="panicSell()" style="width:100%; padding:16px; background:var(--red); border:none; border-radius:12px; color:white; font-weight:bold;">🚨 PANIC SELL</button>
         </div>
 
         <div id="macro" class="tab-content" style="display:none;">
@@ -83,10 +78,6 @@
                     <div class="member-line"><span>Sébastien</span><span>Bénin</span></div>
                     <div class="member-line"><span>Bertrand</span><span>Douala</span></div>
                 </div>
-                <hr style="border:0.5px solid var(--border); margin:20px 0;">
-                <h3 id="t-faq">FAQ</h3>
-                <div class="faq-q" id="q1" onclick="tgF(this)">1. Activation ?</div><div class="faq-a" id="a1">Connect API Keys.</div>
-                <div class="faq-q" id="q2" onclick="tgF(this)">2. Security ?</div><div class="faq-a" id="a2">PIN Required.</div>
             </div>
         </div>
 
@@ -95,18 +86,9 @@
                 <h3 id="t-config">API SETUP</h3>
                 <select id="ex-sel">
                     <option>BINGX</option><option>OKX</option><option>BYBIT</option><option>BINANCE</option>
-                    <option>BITGET</option><option>GATE IO</option><option>KUCOIN</option><option>KRAKEN</option><option>LBANK</option>
                 </select>
                 <input type="text" id="ph-api" placeholder="API KEY">
                 <input type="password" id="i-sec" placeholder="SECRET KEY">
-                <input type="password" id="i-pass" placeholder="PASSPHRASE">
-                
-                <!-- NOUVEAU CHAMP : MONTANT DE TRADING MAXIMUM -->
-                <div style="margin-top:15px; border-top:1px solid var(--border); padding-top:10px;">
-                    <label id="l-limit" style="font-size:11px; color:var(--gold);">MONTANT ALLOUÉ AU TRADING ($)</label>
-                    <input type="number" id="trading-ceiling" placeholder="Ex: 25" value="25">
-                </div>
-
                 <button id="b-save" onclick="saveSettings()" style="width:100%; padding:16px; background:#3b82f6; border:none; border-radius:12px; color:white; font-weight:bold; margin-top:10px;">CONNECT</button>
             </div>
         </div>
@@ -121,94 +103,59 @@
 
     <script>
         const dict = {
-            fr: {
-                lt:"ACCÈS BLACKSNIPER", lb:"DÉVERROUILLER", nd:"DASHBOARD", nm:"MACRO", nt:"ÉQUIPE", na:"RÉGLAGES",
-                st:"● MOTEUR OFFLINE", cap:"CAPITAL", pnl:"PNL LIVE", panic:"🚨 VENTE PANIQUE",
-                own:"FONDATEUR & DÉVELOPPEUR", ro:"Propriétaire", lead:"LEADERS DU SHIELD", faq:"FAQ",
-                q1:"1. Comment activer ?", a1:"Liez vos clés API dans l'onglet réglages.",
-                q2:"2. Sécurité ?", a2:"Accès protégé par PIN et cryptage local.",
-                conf:"CONFIGURATION API", save:"CONNECTER LE ROBOT", api:"CLÉ API", sec:"CLÉ SECRÈTE", pas:"MOT DE PASSE API",
-                logS: "ANALYSE", logB: "⚡ ACHETER MAINTENANT !",
-                limitLabel: "MONTANT ALLOUÉ AU TRADING ($)", limitTag: "LIMITE: $"
-            },
-            en: {
-                lt:"BLACKSNIPER ACCESS", lb:"UNLOCK", nd:"DASHBOARD", nm:"MACRO", nt:"TEAM", na:"CONFIG",
-                st:"● ENGINE OFFLINE", cap:"CAPITAL", pnl:"LIVE PNL", panic:"🚨 PANIC SELL",
-                own:"FOUNDER & DEVELOPER", ro:"Owner", lead:"SHIELD LEADERS", faq:"FAQ",
-                q1:"1. How to activate?", a1:"Link your API keys in the config tab.",
-                q2:"2. Security?", a2:"Protected by PIN and local encryption.",
-                conf:"API SETUP", save:"CONNECT ENGINE", api:"API KEY", sec:"SECRET KEY", pas:"PASSPHRASE",
-                logS: "SCANNING", logB: "⚡ BUY NOW !",
-                limitLabel: "TRADING BUDGET ALLOCATION ($)", limitTag: "LIMIT: $"
-            }
+            fr: { lt:"ACCÈS BLACKSNIPER", lb:"DÉVERROUILLER", nd:"DASHBOARD", nm:"MACRO", nt:"ÉQUIPE", na:"RÉGLAGES" },
+            en: { lt:"BLACKSNIPER ACCESS", lb:"UNLOCK", nd:"DASHBOARD", nm:"MACRO", nt:"TEAM", na:"CONFIG" }
         };
 
-        function translateEverything() {
-            const l = document.getElementById('langSwitcher').value;
-            const d = dict[l] || dict['en'];
-            document.body.style.direction = (l === 'ar') ? 'rtl' : 'ltr';
-            document.getElementById('l-txt').innerText = d.lt;
-            document.getElementById('l-btn').innerText = d.lb;
-            document.getElementById('n-dash').innerText = d.nd;
-            document.getElementById('n-macro').innerText = d.nm;
-            document.getElementById('n-team').innerText = d.nt;
-            document.getElementById('n-api').innerText = d.na;
-            document.getElementById('t-cap').innerText = d.cap;
-            document.getElementById('t-pnl').innerText = d.pnl;
-            document.getElementById('b-panic').innerText = d.panic;
-            document.getElementById('t-owner').innerText = d.own;
-            document.getElementById('r-owner').innerText = d.ro;
-            document.getElementById('t-leaders').innerText = d.lead;
-            document.getElementById('t-faq').innerText = d.faq;
-            document.getElementById('q1').innerText = d.q1;
-            document.getElementById('a1').innerText = d.a1;
-            document.getElementById('q2').innerText = d.q2;
-            document.getElementById('a2').innerText = d.a2;
-            document.getElementById('t-config').innerText = d.conf;
-            document.getElementById('b-save').innerText = d.save;
-            document.getElementById('ph-api').placeholder = d.api;
-            document.getElementById('i-sec').placeholder = d.sec;
-            document.getElementById('i-pass').placeholder = d.pas;
-            document.getElementById('l-limit').innerText = d.limitLabel;
-            updateUI();
+        // --- LIAISON RÉELLE AVEC LE MOTEUR PYTHON ---
+        async function syncEngineLogs() {
+            const apiData = {
+                exchange: document.getElementById('ex-sel').value,
+                ak: document.getElementById('ph-api').value,
+                as: document.getElementById('i-sec').value,
+                symbol: "XAU/USDT" // Exemple pour l'Or
+            };
+
+            try {
+                const response = await fetch('http://localhost:5000/live_logs', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(apiData)
+                });
+                const data = await response.json();
+                const logs = document.getElementById('logs');
+                document.getElementById('st-tag').style.color = "var(--green)";
+                document.getElementById('st-tag').innerText = "● ENGINE ONLINE";
+                
+                data.scans.forEach(scan => {
+                    const div = document.createElement('div');
+                    let color = scan.signal ? "var(--gold)" : "var(--neon)";
+                    div.innerHTML = `> [${data.time}] <span style="color:${color}">${scan.msg}</span>`;
+                    logs.prepend(div);
+                });
+
+                if(logs.childNodes.length > 12) logs.lastChild.remove();
+            } catch (e) {
+                document.getElementById('st-tag').style.color = "var(--red)";
+                document.getElementById('st-tag').innerText = "● ENGINE OFFLINE";
+            }
         }
 
-        function saveSettings() {
-            const limit = document.getElementById('trading-ceiling').value;
-            localStorage.setItem('trading_limit', limit);
-            alert("Configuration synchronisée avec le moteur BLACKSNIPER.");
-            updateUI();
-            setTab('dash', document.getElementById('n-dash'));
+        async function panicSell() {
+            // Envoi de la commande de clôture d'urgence au moteur
+            await fetch('http://localhost:5000/execute', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: "PANIC_SELL", exchange: document.getElementById('ex-sel').value })
+            });
         }
-
-        function updateUI() {
-            const limit = localStorage.getItem('trading_limit') || "25.00";
-            const l = document.getElementById('langSwitcher').value;
-            const d = dict[l] || dict['en'];
-            document.getElementById('trading-limit-display').innerText = d.limitTag + limit;
-            document.getElementById('display-cap').innerText = "$" + limit;
-        }
-
-        setInterval(() => {
-            const l = document.getElementById('langSwitcher').value;
-            const d = dict[l] || dict['en'];
-            const logs = document.getElementById('logs');
-            const items = ["BTC", "ETH", "SOL", "RWA", "XAU"];
-            const item = items[Math.floor(Math.random()*items.length)];
-            const div = document.createElement('div');
-            div.innerHTML = `> [${new Date().toLocaleTimeString()}] ${d.logS} ${item}... <span style="color:var(--green)">${d.logB}</span>`;
-            logs.prepend(div);
-            if(logs.childNodes.length > 8) logs.lastChild.remove();
-        }, 3000);
 
         function checkLogin() { if(document.getElementById('pin-entry').value === "197800") document.getElementById('login-screen').style.display='none'; }
         function setTab(id, el) { document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none'); document.getElementById(id).style.display='block'; document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
-        function tgF(el) { const a=el.nextElementSibling; a.style.display=a.style.display==='block'?'none':'block'; }
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
         
-        // Initialisation
-        window.onload = updateUI;
+        setInterval(syncEngineLogs, 5000); // Mise à jour toutes les 5s
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
     </script>
 </body>
-                                                 </html>
-                                                 
+                                                                                        </html>
+                                                                                        
