@@ -6,38 +6,90 @@
     <title>BLACKSNIPER SMC - GLOBAL</title>
     <style>
         :root { --bg: #05070a; --neon: #00f2ff; --gold: #ffc107; --text: #f8fafc; --red: #ff3333; --green: #00ff88; --border: rgba(255, 255, 255, 0.1); }
-        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; }
+        
         #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .pin-box { background: transparent; border: none; border-bottom: 2px solid var(--neon); color: var(--neon); font-size: 32px; text-align: center; width: 160px; outline: none; letter-spacing: 8px; margin-bottom: 20px; }
+
         .lang-container { position: fixed; top: 12px; right: 12px; z-index: 6000; }
         .lang-select { background: #000; color: var(--neon); border: 1px solid var(--neon); padding: 5px; border-radius: 6px; font-size: 10px; font-weight: bold; }
-        .nav-bar { position: sticky; top: 0; background: rgba(15, 20, 28, 0.95); display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--border); z-index: 5000; backdrop-filter: blur(15px); }
-        .nav-item { padding: 16px 2px; font-size: 9px; font-weight: bold; text-align: center; cursor: pointer; color: #64748b; text-transform: uppercase; }
-        .nav-item.active { color: var(--neon); border-bottom: 2px solid var(--neon); }
-        .glass-card { background: rgba(15, 20, 28, 0.95); border: 1px solid var(--border); border-radius: 20px; padding: 18px; margin: 12px; }
-        .action-btn { width: 100%; padding: 16px; border-radius: 12px; border: none; background: #3b82f6; color: white; font-weight: bold; margin-top: 12px; cursor: pointer; }
-        #radar-screen { background: #000; border-radius: 12px; padding: 12px; height: 140px; font-family: 'Courier New', monospace; font-size: 9px; color: var(--neon); overflow-y: auto; border: 1px solid var(--border); }
-        .faq-item { margin-top: 8px; border: 1px solid var(--border); border-radius: 10px; }
-        .faq-q { padding: 12px; cursor: pointer; font-size: 11px; font-weight: bold; background: rgba(255,255,255,0.02); }
-        .faq-a { display: none; padding: 12px; font-size: 10px; color: #aaa; border-top: 1px solid var(--border); }
-        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; margin-top: 8px; box-sizing: border-box; }
+
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(15, 20, 28, 0.98); display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--border); z-index: 5000; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { padding: 18px 2px; font-size: 9px; font-weight: bold; text-align: center; cursor: pointer; color: #64748b; text-transform: uppercase; }
+        .nav-item.active { color: var(--neon); border-top: 2px solid var(--neon); }
+
+        .content-area { height: calc(100vh - 75px); overflow-y: auto; padding: 10px; padding-bottom: 80px; }
+        .glass-card { background: rgba(15, 20, 28, 0.95); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
+        #realtime-monitor { background: #000; border-radius: 12px; padding: 15px; height: 180px; font-family: 'Courier New', monospace; font-size: 10px; color: var(--neon); overflow-y: auto; border: 1px solid var(--border); }
+        
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; margin-top: 10px; box-sizing: border-box; }
+        .member-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
+        .faq-q { padding: 12px; cursor: pointer; font-size: 11px; font-weight: bold; background: rgba(255,255,255,0.02); border-radius: 8px; margin-top: 5px; }
+        .faq-a { display: none; padding: 12px; font-size: 10px; color: #aaa; }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN -->
     <div id="login-screen">
-        <div id="log-txt" style="color:var(--gold); font-weight:bold; letter-spacing:3px; margin-bottom:20px;">BLACKSNIPER LOGIN</div>
+        <div id="l-txt" style="color:var(--gold); font-weight:bold; letter-spacing:3px; margin-bottom:20px;">BLACKSNIPER ACCESS</div>
         <input type="password" id="pin-entry" class="pin-box" maxlength="6" placeholder="••••••">
-        <button id="log-btn" class="action-btn" style="width:140px;" onclick="checkLogin()">ACCÈS</button>
+        <button id="l-btn" class="action-btn" style="width:140px; background:#3b82f6; color:white; border:none; padding:15px; border-radius:10px;" onclick="checkLogin()">UNLOCK</button>
     </div>
 
-    <!-- LANG SELECTOR -->
     <div class="lang-container">
-        <select id="langSwitcher" class="lang-select" onchange="applyFullTranslation()">
-            <option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option>
-            <option value="es">🇪🇸 ES</option><option value="de">🇩🇪 DE</option><option value="ar">🇸🇦 AR</option>
+        <select id="langSwitcher" class="lang-select" onchange="translateEverything()">
+            <option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option><option value="es">🇪🇸 ES</option><option value="de">🇩🇪 DE</option><option value="ar">🇸🇦 AR</option>
         </select>
+    </div>
+
+    <div class="content-area">
+        <div id="dash" class="tab-content">
+            <div class="glass-card">
+                <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:15px;">
+                    <span id="st-tag" style="color:var(--red);">● ENGINE OFFLINE</span><span id="clock">00:00:00</span>
+                </div>
+                <div style="display:flex; justify-content:space-around; margin-bottom:20px; text-align:center;">
+                    <div><small id="t-cap">CAPITAL</small><div style="font-size:22px; color:var(--gold); font-weight:bold;">$25.00</div></div>
+                    <div><small id="t-pnl">PNL LIVE</small><div id="live-pnl" style="font-size:22px; color:var(--green); font-weight:bold;">+$0.00</div></div>
+                </div>
+                <div id="realtime-monitor"><div id="logs">> WAITING FOR SERVER...</div></div>
+            </div>
+            <button id="b-panic" style="width:100%; padding:16px; background:var(--red); border:none; border-radius:12px; color:white; font-weight:bold;">🚨 PANIC SELL</button>
+        </div>
+
+        <div id="team" class="tab-content" style="display:none;">
+            <div class="glass-card">
+                <h3 id="t-owner" style="color:var(--gold); margin-top:0;">FOUNDER & DEV</h3>
+                <div class="member-line" style="background:rgba(255,193,7,0.1); padding:10px; border-radius:10px;">
+                    <span style="font-weight:bold;">MASTER NASSER</span><span id="r-owner">Propriétaire</span>
+                </div>
+                <h3 id="t-leaders" style="margin-top:20px;">SHIELD LEADERS</h3>
+                <div id="team-members">
+                    <div class="member-line"><span>Albert</span><span>Togo</span></div>
+                    <div class="member-line"><span>Marie</span><span>Guadeloupe</span></div>
+                    <div class="member-line"><span>Sébastien</span><span>Bénin</span></div>
+                    <div class="member-line"><span>Bertrand</span><span>Douala</span></div>
+                </div>
+                <hr style="border:0.5px solid var(--border); margin:20px 0;">
+                <h3 id="t-faq">FAQ</h3>
+                <div class="faq-q" id="q1" onclick="tgF(this)">1. Activation ?</div><div class="faq-a" id="a1">Connect API Keys.</div>
+                <div class="faq-q" id="q2" onclick="tgF(this)">2. Security ?</div><div class="faq-a" id="a2">PIN Required.</div>
+            </div>
+        </div>
+
+        <div id="config" class="tab-content" style="display:none;">
+            <div class="glass-card">
+                <h3 id="t-config">API SETUP</h3>
+                <select id="ex-sel">
+                    <option>BINGX</option><option>OKX</option><option>BYBIT</option><option>BINANCE</option>
+                    <option>BITGET</option><option>GATE IO</option><option>KUCOIN</option><option>KRAKEN</option><option>LBANK</option>
+                </select>
+                <input type="text" id="i-api" placeholder="API KEY">
+                <input type="password" id="i-sec" placeholder="SECRET KEY">
+                <input type="password" id="i-pass" placeholder="PASSPHRASE">
+                <button id="b-save" style="width:100%; padding:16px; background:#3b82f6; border:none; border-radius:12px; color:white; font-weight:bold; margin-top:10px;">CONNECT</button>
+            </div>
+        </div>
     </div>
 
     <div class="nav-bar">
@@ -47,114 +99,100 @@
         <div class="nav-item" id="n-api" onclick="setTab('config', this)">API</div>
     </div>
 
-    <!-- DASHBOARD -->
-    <div id="dash" class="tab-content" style="padding-top:10px;">
-        <div class="glass-card">
-            <h3 id="t-engine" style="margin:0; font-size:14px; color:var(--green);">● SMC ENGINE V57 ACTIVE</h3>
-            <div style="display:flex; justify-content:space-around; margin:20px 0; text-align:center;">
-                <div><small id="t-cap">CAPITAL</small><div style="font-size:22px; color:var(--gold); font-weight:bold;">$25.00</div></div>
-                <div><small id="t-pnl">PNL LIVE</small><div style="font-size:22px; color:var(--green); font-weight:bold;">+$0.00</div></div>
-            </div>
-            <div id="radar-screen"><div id="radar-logs">> INITIALISATION...</div></div>
-        </div>
-        <div style="padding:0 12px;"><button id="btn-panic" class="action-btn" style="background:var(--red);">🚨 PANIC SELL</button></div>
-    </div>
-
-    <!-- TEAM & FAQ -->
-    <div id="team" class="tab-content" style="display:none; padding:10px;">
-        <div class="glass-card">
-            <h3 id="t-team-title" style="color:var(--gold); margin-top:0;">SHIELD LEADERS</h3>
-            <div id="leader-list" style="font-size:11px; line-height:1.8;">
-                🟢 Albert (Togo) | 🟢 Marie (Guadeloupe) | 🟢 Sébastien (Bénin) | 🟢 Bertrand (Douala) | 🟢 Eva (Elite) | 🟢 Franco (Expert)
-            </div>
-            <hr style="border:0.5px solid var(--border); margin:20px 0;">
-            <h3 id="t-faq-title">FAQ</h3>
-            <div class="faq-item"><div class="faq-q" id="q1" onclick="tgF(this)">1. Activation ?</div><div class="faq-a" id="a1">Connect API keys.</div></div>
-            <div class="faq-item"><div class="faq-q" id="q2" onclick="tgF(this)">2. Security ?</div><div class="faq-a" id="a2">PIN 197800 required.</div></div>
-        </div>
-    </div>
-
-    <!-- CONFIG API -->
-    <div id="config" class="tab-content" style="display:none; padding:10px;">
-        <div class="glass-card">
-            <h3 id="t-api-title">API CONFIG</h3>
-            <select><option>BINGX</option><option>OKX</option><option>BYBIT</option><option>BINANCE</option><option>BITGET</option><option>GATE IO</option><option>KUCOIN</option><option>KRAKEN</option><option>LBANK</option></select>
-            <input type="text" id="ph-api" placeholder="API KEY">
-            <input type="password" id="ph-sec" placeholder="SECRET KEY">
-            <input type="password" id="ph-pass" placeholder="PASSPHRASE">
-            <button id="btn-save" class="action-btn">SAVE</button>
-        </div>
-    </div>
-
     <script>
-        const fullDict = {
+        const dict = {
             fr: {
-                logTxt: "ACCÈS BLACKSNIPER", logBtn: "ENTRER", dash: "TABLEAU", macro: "MACRO", team: "ÉQUIPE", api: "RÉGLAGES",
-                engine: "● MOTEUR SMC V57 ACTIF", cap: "CAPITAL", pnl: "PNL EN DIRECT", panic: "🚨 VENTE PANIQUE",
-                teamT: "LEADERS DU SHIELD", faqT: "QUESTIONS FRÉQUENTES",
-                q1: "1. Comment activer ?", a1: "Allez dans l'onglet API pour lier vos clés d'échange.",
-                q2: "2. Sécurité ?", a2: "Accès protégé par le code PIN 197800 et cryptage local.",
-                apiT: "CONFIGURATION DES CLÉS", save: "ENREGISTRER", phApi: "CLÉ API", phSec: "CLÉ SECRÈTE", phPass: "MOT DE PASSE API"
+                lt:"ACCÈS BLACKSNIPER", lb:"DÉVERROUILLER", nd:"DASHBOARD", nm:"MACRO", nt:"ÉQUIPE", na:"RÉGLAGES",
+                st:"● MOTEUR OFFLINE", cap:"CAPITAL", pnl:"PNL LIVE", panic:"🚨 VENTE PANIQUE",
+                own:"FONDATEUR & DÉVELOPPEUR", ro:"Propriétaire", lead:"LEADERS DU SHIELD", faq:"FAQ",
+                q1:"1. Comment activer ?", a1:"Liez vos clés API dans l'onglet réglages.",
+                q2:"2. Sécurité ?", a2:"Accès protégé par PIN et cryptage local.",
+                conf:"CONFIGURATION API", save:"CONNECTER LE ROBOT", api:"CLÉ API", sec:"CLÉ SECRÈTE", pas:"MOT DE PASSE API",
+                logS: "SCANNING", logB: "⚡ ACHETER / SHOP MAINTENANT !"
             },
             en: {
-                logTxt: "BLACKSNIPER ACCESS", logBtn: "UNLOCK", dash: "DASH", macro: "MACRO", team: "TEAM", api: "CONFIG",
-                engine: "● SMC ENGINE V57 ACTIVE", cap: "CAPITAL", pnl: "LIVE PNL", panic: "🚨 PANIC SELL",
-                teamT: "SHIELD LEADERS", faqT: "FAQ",
-                q1: "1. How to activate?", a1: "Go to the API tab to link your exchange keys.",
-                q2: "2. Security?", a2: "Protected by PIN code 197800 and local encryption.",
-                apiT: "API KEY SETUP", save: "SAVE CONFIG", phApi: "API KEY", phSec: "SECRET KEY", phPass: "PASSPHRASE"
+                lt:"BLACKSNIPER ACCESS", lb:"UNLOCK", nd:"DASHBOARD", nm:"MACRO", nt:"TEAM", na:"CONFIG",
+                st:"● ENGINE OFFLINE", cap:"CAPITAL", pnl:"LIVE PNL", panic:"🚨 PANIC SELL",
+                own:"FOUNDER & DEVELOPER", ro:"Owner", lead:"SHIELD LEADERS", faq:"FAQ",
+                q1:"1. How to activate?", a1:"Link your API keys in the config tab.",
+                q2:"2. Security?", a2:"Protected by PIN and local encryption.",
+                conf:"API SETUP", save:"CONNECT ENGINE", api:"API KEY", sec:"SECRET KEY", pas:"PASSPHRASE",
+                logS: "SCANNING", logB: "⚡ BUY / SHOP NOW !"
+            },
+            es: {
+                lt:"ACCESO BLACKSNIPER", lb:"DESBLOQUEAR", nd:"TABLERO", nm:"MACRO", nt:"EQUIPO", na:"AJUSTES",
+                st:"● MOTOR DESCONECTADO", cap:"CAPITAL", pnl:"PNL EN VIVO", panic:"🚨 VENTA DE PÁNICO",
+                own:"FUNDADOR Y DESARROLLADOR", ro:"Propietario", lead:"LÍDERES DE SHIELD", faq:"FAQ",
+                q1:"1. ¿Cómo activar?", a1:"Vincula tus claves API en la pestaña de ajustes.",
+                q2:"2. ¿Seguridad?", a2:"Protegido por PIN y cifrado local.",
+                conf:"CONFIGURACIÓN API", save:"CONECTAR ROBOT", api:"CLAVE API", sec:"CLAVE SECRETA", pas:"FRASE DE SEGURIDAD",
+                logS: "ESCANEO", logB: "⚡ ¡COMPRAR / SHOP AHORA!"
+            },
+            de: {
+                lt:"BLACKSNIPER ZUGANG", lb:"ENTSPERREN", nd:"DASHBOARD", nm:"MAKRO", nt:"TEAM", na:"SETUP",
+                st:"● ENGINE OFFLINE", cap:"KAPITAL", pnl:"LIVE PNL", panic:"🚨 PANIKVERKAUF",
+                own:"GRÜNDER & ENTWICKLER", ro:"Besitzer", lead:"SHIELD LEADERS", faq:"FAQ",
+                q1:"1. Wie aktivieren?", a1:"Verknüpfen Sie API-Keys im Setup-Tab.",
+                q2:"2. Sicherheit?", a2:"PIN-geschützt und lokale Verschlüsselung.",
+                conf:"API KONFIGURATION", save:"ROBOTER STARTEN", api:"API-SCHLÜSSEL", sec:"GEHEIMSCHLÜSSEL", pas:"PASSPHRASE",
+                logS: "SCANNT", logB: "⚡ JETZT KAUFEN / SHOP!"
             },
             ar: {
-                logTxt: "دخول القناص الأسود", logBtn: "فتح", dash: "لوحة", macro: "ماكرو", team: "الفريق", api: "إعدادات",
-                engine: "● محرك SMC V57 نشط", cap: "رأس المال", pnl: "الأرباح المباشرة", panic: "🚨 بيع اضطراري",
-                teamT: "قادة الدرع", faqT: "الأسئلة الشائعة",
-                q1: "1. كيف يتم التفعيل؟", a1: "انتقل إلى علامة تبويب API لربط مفاتيح التبادل الخاصة بك.",
-                q2: "2. الأمان؟", a2: "محمي برمز PIN 197800 وتشفير محلي.",
-                apiT: "إعداد مفتاح API", save: "حفظ الإعدادات", phApi: "مفتاح API", phSec: "المفتاح السري", phPass: "عبارة المرور"
+                lt:"دخول BLACKSNIPER", lb:"فتح القفل", nd:"لوحة التحكم", nm:"ماكرو", nt:"الفريق", na:"إعدادات",
+                st:"● المحرك غير متصل", cap:"رأس المال", pnl:"الأرباح المباشرة", panic: "🚨 بيع اضطراري",
+                own:"المؤسس والمطور", ro:"المالك", lead:"قادة الدرع", faq:"الأسئلة الشائعة",
+                q1:"1. كيف يتم التفعيل؟", a1:"اربط مفاتيح API في علامة تبويب الإعدادات.",
+                q2:"2. الأمان؟", a2:"محمي برمز PIN وتشفير محلي.",
+                conf:"إعداد API", save:"اتصال المحرك", api:"مفتاح API", sec:"المفتاح السري", pas:"عبارة المرور",
+                logS: "جارٍ المسح", logB: "⚡ شراء / تسوق الآن !"
             }
         };
 
-        function checkLogin() { if(document.getElementById('pin-entry').value === "197800") document.getElementById('login-screen').style.display='none'; }
-        function setTab(id, el) { document.querySelectorAll('.tab-content').forEach(t => t.style.display='none'); document.getElementById(id).style.display='block'; document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
-        function tgF(el) { const a = el.nextElementSibling; a.style.display = a.style.display==='block' ? 'none' : 'block'; }
-
-        function applyFullTranslation() {
+        function translateEverything() {
             const l = document.getElementById('langSwitcher').value;
-            const d = fullDict[l] || fullDict['en'];
+            const d = dict[l] || dict['en'];
             document.body.style.direction = (l === 'ar') ? 'rtl' : 'ltr';
             
-            // Appliquer à CHAQUE ID de l'interface
-            document.getElementById('log-txt').innerText = d.logTxt;
-            document.getElementById('log-btn').innerText = d.logBtn;
-            document.getElementById('n-dash').innerText = d.dash;
-            document.getElementById('n-macro').innerText = d.macro;
-            document.getElementById('n-team').innerText = d.team;
-            document.getElementById('n-api').innerText = d.api;
-            document.getElementById('t-engine').innerText = d.engine;
+            document.getElementById('l-txt').innerText = d.lt;
+            document.getElementById('l-btn').innerText = d.lb;
+            document.getElementById('n-dash').innerText = d.nd;
+            document.getElementById('n-team').innerText = d.nt;
+            document.getElementById('n-api').innerText = d.na;
             document.getElementById('t-cap').innerText = d.cap;
             document.getElementById('t-pnl').innerText = d.pnl;
-            document.getElementById('btn-panic').innerText = d.panic;
-            document.getElementById('t-team-title').innerText = d.teamT;
-            document.getElementById('t-faq-title').innerText = d.faqT;
-            document.getElementById('q1').innerText = d.q1; document.getElementById('a1').innerText = d.a1;
-            document.getElementById('q2').innerText = d.q2; document.getElementById('a2').innerText = d.a2;
-            document.getElementById('t-api-title').innerText = d.apiT;
-            document.getElementById('btn-save').innerText = d.save;
-            document.getElementById('ph-api').placeholder = d.phApi;
-            document.getElementById('ph-sec').placeholder = d.phSec;
-            document.getElementById('ph-pass').placeholder = d.phPass;
+            document.getElementById('b-panic').innerText = d.panic;
+            document.getElementById('t-owner').innerText = d.own;
+            document.getElementById('r-owner').innerText = d.ro;
+            document.getElementById('t-leaders').innerText = d.lead;
+            document.getElementById('t-faq').innerText = d.faq;
+            document.getElementById('q1').innerText = d.q1;
+            document.getElementById('a1').innerText = d.a1;
+            document.getElementById('q2').innerText = d.q2;
+            document.getElementById('a2').innerText = d.a2;
+            document.getElementById('t-config').innerText = d.conf;
+            document.getElementById('b-save').innerText = d.save;
+            document.getElementById('i-api').placeholder = d.api;
+            document.getElementById('i-sec').placeholder = d.sec;
+            document.getElementById('i-pass').placeholder = d.pas;
         }
 
         setInterval(() => {
+            const l = document.getElementById('langSwitcher').value;
+            const d = dict[l] || dict['en'];
             const logs = document.getElementById('radar-logs');
-            const items = ["BTC", "ETH", "SOL", "RWA", "GOLD"];
+            const items = ["BTC", "ETH", "SOL", "RWA", "XAU"];
             const item = items[Math.floor(Math.random()*items.length)];
             const div = document.createElement('div');
-            div.innerHTML = `> [${new Date().toLocaleTimeString()}] SCANNING ${item}... <span style="color:var(--green)">LIQUIDITY OK</span>`;
+            div.innerHTML = `> [${new Date().toLocaleTimeString()}] ${d.logS} ${item}... <span style="color:var(--green)">${d.logB}</span>`;
             logs.prepend(div);
             if(logs.childNodes.length > 8) logs.lastChild.remove();
         }, 3000);
+
+        function checkLogin() { if(document.getElementById('pin-entry').value === "197800") document.getElementById('login-screen').style.display='none'; }
+        function setTab(id, el) { document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none'); document.getElementById(id).style.display='block'; document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
+        function tgF(el) { const a=el.nextElementSibling; a.style.display=a.style.display==='block'?'none':'block'; }
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
     </script>
 </body>
-</html>
-Dfe
+                        </html>
+    
