@@ -28,6 +28,9 @@
         .member-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
         .faq-q { padding: 12px; cursor: pointer; font-size: 11px; font-weight: bold; background: rgba(255,255,255,0.02); border-radius: 8px; margin-top: 5px; }
         .faq-a { display: none; padding: 12px; font-size: 10px; color: #aaa; }
+        
+        /* Style pour le badge du budget trading */
+        .budget-badge { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--neon); color: var(--neon); padding: 4px 8px; border-radius: 5px; font-size: 10px; margin-top: 5px; display: inline-block; }
     </style>
 </head>
 <body>
@@ -38,7 +41,6 @@
         <button id="l-btn" style="width:140px; background:#3b82f6; color:white; border:none; padding:15px; border-radius:10px; font-weight:bold;" onclick="checkLogin()">UNLOCK</button>
     </div>
 
-    <!-- BARRE DE STATUT CORRIGÉE -->
     <div class="top-status-bar">
         <div id="clock">00:00:00</div>
         <select id="langSwitcher" class="lang-select" onchange="translateEverything()">
@@ -51,9 +53,10 @@
             <div class="glass-card">
                 <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:15px;">
                     <span id="st-tag" style="color:var(--red);">● ENGINE OFFLINE</span>
+                    <div id="trading-limit-display" class="budget-badge">LIMIT: $0.00</div>
                 </div>
                 <div style="display:flex; justify-content:space-around; margin-bottom:20px; text-align:center;">
-                    <div><small id="t-cap">CAPITAL</small><div style="font-size:22px; color:var(--gold); font-weight:bold;">$25.00</div></div>
+                    <div><small id="t-cap">CAPITAL</small><div id="display-cap" style="font-size:22px; color:var(--gold); font-weight:bold;">$0.00</div></div>
                     <div><small id="t-pnl">PNL LIVE</small><div id="live-pnl" style="font-size:22px; color:var(--green); font-weight:bold;">+$0.00</div></div>
                 </div>
                 <div id="realtime-monitor"><div id="logs">> WAITING FOR SERVER...</div></div>
@@ -61,7 +64,6 @@
             <button id="b-panic" style="width:100%; padding:16px; background:var(--red); border:none; border-radius:12px; color:white; font-weight:bold;">🚨 PANIC SELL</button>
         </div>
 
-        <!-- SECTION MACRO NEWS (INVESTING.COM) -->
         <div id="macro" class="tab-content" style="display:none;">
             <div class="glass-card" style="padding:0; height: 500px;">
                 <iframe src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=2,3&features=datepicker,timezone&countries=25,32,6,37,7,5,22,39,14,10,35,43,56,36,110,11,26,12,4,17,38,42,15,45,72,35,43&calType=day&timeZone=58&lang=5" width="100%" height="100%" frameborder="0" allowtransparency="true"></iframe>
@@ -98,7 +100,14 @@
                 <input type="text" id="ph-api" placeholder="API KEY">
                 <input type="password" id="i-sec" placeholder="SECRET KEY">
                 <input type="password" id="i-pass" placeholder="PASSPHRASE">
-                <button id="b-save" style="width:100%; padding:16px; background:#3b82f6; border:none; border-radius:12px; color:white; font-weight:bold; margin-top:10px;">CONNECT</button>
+                
+                <!-- NOUVEAU CHAMP : MONTANT DE TRADING MAXIMUM -->
+                <div style="margin-top:15px; border-top:1px solid var(--border); padding-top:10px;">
+                    <label id="l-limit" style="font-size:11px; color:var(--gold);">MONTANT ALLOUÉ AU TRADING ($)</label>
+                    <input type="number" id="trading-ceiling" placeholder="Ex: 25" value="25">
+                </div>
+
+                <button id="b-save" onclick="saveSettings()" style="width:100%; padding:16px; background:#3b82f6; border:none; border-radius:12px; color:white; font-weight:bold; margin-top:10px;">CONNECT</button>
             </div>
         </div>
     </div>
@@ -119,7 +128,8 @@
                 q1:"1. Comment activer ?", a1:"Liez vos clés API dans l'onglet réglages.",
                 q2:"2. Sécurité ?", a2:"Accès protégé par PIN et cryptage local.",
                 conf:"CONFIGURATION API", save:"CONNECTER LE ROBOT", api:"CLÉ API", sec:"CLÉ SECRÈTE", pas:"MOT DE PASSE API",
-                logS: "ANALYSE", logB: "⚡ ACHETER MAINTENANT !"
+                logS: "ANALYSE", logB: "⚡ ACHETER MAINTENANT !",
+                limitLabel: "MONTANT ALLOUÉ AU TRADING ($)", limitTag: "LIMITE: $"
             },
             en: {
                 lt:"BLACKSNIPER ACCESS", lb:"UNLOCK", nd:"DASHBOARD", nm:"MACRO", nt:"TEAM", na:"CONFIG",
@@ -128,16 +138,8 @@
                 q1:"1. How to activate?", a1:"Link your API keys in the config tab.",
                 q2:"2. Security?", a2:"Protected by PIN and local encryption.",
                 conf:"API SETUP", save:"CONNECT ENGINE", api:"API KEY", sec:"SECRET KEY", pas:"PASSPHRASE",
-                logS: "SCANNING", logB: "⚡ BUY NOW !"
-            },
-            ar: {
-                lt:"دخول BLACKSNIPER", lb:"فتح القفل", nd:"لوحة التحكم", nm:"ماكرو", nt:"الفريق", na:"إعدادات",
-                st:"● المحرك غير متصل", cap:"رأس المال", pnl:"الأرباح المباشرة", panic: "🚨 بيع اضطراري",
-                own:"المؤسس والمطور", ro:"المالك", lead:"قادة الدرع", faq:"الأسئلة الشائعة",
-                q1:"1. كيف يتم التفعيل؟", a1:"اربط مفاتيح API في علامة تبويب الإعدادات.",
-                q2:"2. الأمان؟", a2:"محمي برمز PIN وتشفير محلي.",
-                conf:"إعداد API", save:"اتصال المحرك", api:"مفتاح API", sec:"المفتاح السري", pas:"عبارة المرور",
-                logS: "جارٍ المسح", logB: "⚡ شراء الآن !"
+                logS: "SCANNING", logB: "⚡ BUY NOW !",
+                limitLabel: "TRADING BUDGET ALLOCATION ($)", limitTag: "LIMIT: $"
             }
         };
 
@@ -167,6 +169,24 @@
             document.getElementById('ph-api').placeholder = d.api;
             document.getElementById('i-sec').placeholder = d.sec;
             document.getElementById('i-pass').placeholder = d.pas;
+            document.getElementById('l-limit').innerText = d.limitLabel;
+            updateUI();
+        }
+
+        function saveSettings() {
+            const limit = document.getElementById('trading-ceiling').value;
+            localStorage.setItem('trading_limit', limit);
+            alert("Configuration synchronisée avec le moteur BLACKSNIPER.");
+            updateUI();
+            setTab('dash', document.getElementById('n-dash'));
+        }
+
+        function updateUI() {
+            const limit = localStorage.getItem('trading_limit') || "25.00";
+            const l = document.getElementById('langSwitcher').value;
+            const d = dict[l] || dict['en'];
+            document.getElementById('trading-limit-display').innerText = d.limitTag + limit;
+            document.getElementById('display-cap').innerText = "$" + limit;
         }
 
         setInterval(() => {
@@ -185,7 +205,10 @@
         function setTab(id, el) { document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none'); document.getElementById(id).style.display='block'; document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
         function tgF(el) { const a=el.nextElementSibling; a.style.display=a.style.display==='block'?'none':'block'; }
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+        
+        // Initialisation
+        window.onload = updateUI;
     </script>
 </body>
-            </html>
-            
+                                                 </html>
+                                                 
