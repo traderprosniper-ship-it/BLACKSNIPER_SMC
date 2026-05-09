@@ -24,8 +24,9 @@
         #realtime-monitor { background: #000; border-radius: 12px; padding: 15px; height: 180px; font-family: 'Courier New', monospace; font-size: 10px; color: var(--neon); overflow-y: auto; border: 1px solid var(--border); }
         
         input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; margin-top: 8px; box-sizing: border-box; }
-        .budget-badge { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--neon); color: var(--neon); padding: 4px 8px; border-radius: 5px; font-size: 10px; margin-top: 5px; display: inline-block; }
         .member-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
+        .faq-q { padding: 12px; cursor: pointer; font-size: 11px; font-weight: bold; background: rgba(255,255,255,0.02); border-radius: 8px; margin-top: 5px; }
+        .faq-a { display: none; padding: 12px; font-size: 10px; color: #aaa; }
     </style>
 </head>
 <body>
@@ -39,7 +40,11 @@
     <div class="top-status-bar">
         <div id="clock">00:00:00</div>
         <select id="langSwitcher" class="lang-select" onchange="translateEverything()">
-            <option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option><option value="ar">🇸🇦 AR</option>
+            <option value="fr">🇫🇷 FR</option>
+            <option value="en">🇬🇧 EN</option>
+            <option value="es">🇪🇸 ES</option>
+            <option value="de">🇩🇪 DE</option>
+            <option value="ar">🇸🇦 AR</option>
         </select>
     </div>
 
@@ -48,13 +53,12 @@
             <div class="glass-card">
                 <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:15px;">
                     <span id="st-tag" style="color:var(--red);">● ENGINE OFFLINE</span>
-                    <div id="trading-limit-display" class="budget-badge">LIMIT: $25.00</div>
                 </div>
                 <div style="display:flex; justify-content:space-around; margin-bottom:20px; text-align:center;">
-                    <div><small id="t-cap">CAPITAL</small><div id="display-cap" style="font-size:22px; color:var(--gold); font-weight:bold;">$25.00</div></div>
+                    <div><small id="t-cap">CAPITAL</small><div id="display-cap" style="font-size:22px; color:var(--gold); font-weight:bold;">$0.00</div></div>
                     <div><small id="t-pnl">PNL LIVE</small><div id="live-pnl" style="font-size:22px; color:var(--green); font-weight:bold;">+$0.00</div></div>
                 </div>
-                <div id="realtime-monitor"><div id="logs">> WAITING FOR ENGINE...</div></div>
+                <div id="realtime-monitor"><div id="logs">> WAITING FOR SERVER...</div></div>
             </div>
             <button id="b-panic" onclick="panicSell()" style="width:100%; padding:16px; background:var(--red); border:none; border-radius:12px; color:white; font-weight:bold;">🚨 PANIC SELL</button>
         </div>
@@ -73,11 +77,15 @@
                 </div>
                 <h3 id="t-leaders" style="margin-top:20px;">SHIELD LEADERS</h3>
                 <div id="team-members">
-                    <div class="member-line"><span>Albert</span><span>Togo</span></div>
-                    <div class="member-line"><span>Marie</span><span>Guadeloupe</span></div>
-                    <div class="member-line"><span>Sébastien</span><span>Bénin</span></div>
-                    <div class="member-line"><span>Bertrand</span><span>Douala</span></div>
+                    <div class="member-line"><span>Albert (Togo)</span><span style="color:var(--neon)">Marketing Lead</span></div>
+                    <div class="member-line"><span>Marie (Guadeloupe)</span><span style="color:var(--neon)">Community Manager</span></div>
+                    <div class="member-line"><span>Sébastien (Bénin)</span><span style="color:var(--neon)">Analyste Pro</span></div>
+                    <div class="member-line"><span>Bertrand (Douala)</span><span style="color:var(--neon)">Support Technique</span></div>
                 </div>
+                <hr style="border:0.5px solid var(--border); margin:20px 0;">
+                <h3 id="t-faq">FAQ</h3>
+                <div class="faq-q" id="q1" onclick="tgF(this)">1. Activation ?</div><div class="faq-a" id="a1">Liez vos clés API dans l'onglet réglages.</div>
+                <div class="faq-q" id="q2" onclick="tgF(this)">2. Sécurité ?</div><div class="faq-a" id="a2">Accès protégé par PIN et cryptage local.</div>
             </div>
         </div>
 
@@ -86,9 +94,15 @@
                 <h3 id="t-config">API SETUP</h3>
                 <select id="ex-sel">
                     <option>BINGX</option><option>OKX</option><option>BYBIT</option><option>BINANCE</option>
+                    <option>DERIV</option><option>ADMIRALS</option><option>EXNESS</option><option>BITGET</option>
+                    <option>GATE IO</option><option>KUCOIN</option><option>KRAKEN</option><option>LBANK</option>
                 </select>
                 <input type="text" id="ph-api" placeholder="API KEY">
                 <input type="password" id="i-sec" placeholder="SECRET KEY">
+                <div style="margin-top:15px; border-top:1px solid var(--border); padding-top:10px;">
+                    <label style="font-size:11px; color:var(--gold);">TRADING BUDGET ($)</label>
+                    <input type="number" id="trading-amount" placeholder="Entrez votre capital (ex: 10, 25, 100...)" oninput="updateCapitalDisplay()">
+                </div>
                 <button id="b-save" onclick="saveSettings()" style="width:100%; padding:16px; background:#3b82f6; border:none; border-radius:12px; color:white; font-weight:bold; margin-top:10px;">CONNECT</button>
             </div>
         </div>
@@ -103,59 +117,62 @@
 
     <script>
         const dict = {
-            fr: { lt:"ACCÈS BLACKSNIPER", lb:"DÉVERROUILLER", nd:"DASHBOARD", nm:"MACRO", nt:"ÉQUIPE", na:"RÉGLAGES" },
-            en: { lt:"BLACKSNIPER ACCESS", lb:"UNLOCK", nd:"DASHBOARD", nm:"MACRO", nt:"TEAM", na:"CONFIG" }
+            fr: { lt:"ACCÈS BLACKSNIPER", lb:"DÉVERROUILLER", nd:"DASHBOARD", nm:"MACRO", nt:"ÉQUIPE", na:"RÉGLAGES", cap:"CAPITAL", pnl:"PNL LIVE", own:"FONDATEUR & DEV", lead:"LEADERS DU SHIELD", conf:"CONFIG API", save:"CONNECTER" },
+            en: { lt:"BLACKSNIPER ACCESS", lb:"UNLOCK", nd:"DASHBOARD", nm:"MACRO", nt:"TEAM", na:"CONFIG", cap:"CAPITAL", pnl:"LIVE PNL", own:"FOUNDER & DEV", lead:"SHIELD LEADERS", conf:"API SETUP", save:"CONNECT" },
+            es: { lt:"ACCESO BLACKSNIPER", lb:"DESBLOQUEAR", nd:"TABLERO", nm:"MACRO", nt:"EQUIPO", na:"AJUSTES", cap:"CAPITAL", pnl:"PNL EN VIVO", own:"FUNDADOR", lead:"LÍDERES", conf:"CONFIG API", save:"CONECTAR" },
+            de: { lt:"BLACKSNIPER ZUGANG", lb:"ENTSPERREN", nd:"DASHBOARD", nm:"MAKRO", nt:"TEAM", na:"SETUP", cap:"KAPITAL", pnl:"LIVE PNL", own:"GRÜNDER", lead:"LEADER", conf:"API SETUP", save:"VERBINDEN" },
+            ar: { lt:"دخول BLACKSNIPER", lb:"فتح", nd:"لوحة التحكم", nm:"ماكرو", nt:"الفريق", na:"إعدادات", cap:"رأس المال", pnl:"الأرباح", own:"المؤسس", lead:"القادة", conf:"إعداد API", save:"اتصال" }
         };
 
-        // --- LIAISON RÉELLE AVEC LE MOTEUR PYTHON ---
-        async function syncEngineLogs() {
-            const apiData = {
-                exchange: document.getElementById('ex-sel').value,
-                ak: document.getElementById('ph-api').value,
-                as: document.getElementById('i-sec').value,
-                symbol: "XAU/USDT" // Exemple pour l'Or
-            };
+        function updateCapitalDisplay() {
+            const val = document.getElementById('trading-amount').value || "0.00";
+            document.getElementById('display-cap').innerText = "$" + val;
+        }
 
+        function translateEverything() {
+            const l = document.getElementById('langSwitcher').value;
+            const d = dict[l] || dict['en'];
+            document.getElementById('l-txt').innerText = d.lt;
+            document.getElementById('l-btn').innerText = d.lb;
+            document.getElementById('n-dash').innerText = d.nd;
+            document.getElementById('n-macro').innerText = d.nm;
+            document.getElementById('n-team').innerText = d.nt;
+            document.getElementById('n-api').innerText = d.na;
+            document.getElementById('t-cap').innerText = d.cap;
+            document.getElementById('t-pnl').innerText = d.pnl;
+            document.getElementById('t-owner').innerText = d.own;
+            document.getElementById('t-leaders').innerText = d.lead;
+            document.getElementById('t-config').innerText = d.conf;
+            document.getElementById('b-save').innerText = d.save;
+        }
+
+        async function syncEngineLogs() {
+            const apiData = { exchange: document.getElementById('ex-sel').value, ak: document.getElementById('ph-api').value, as: document.getElementById('i-sec').value, capital: document.getElementById('trading-amount').value };
             try {
-                const response = await fetch('http://localhost:5000/live_logs', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(apiData)
-                });
+                const response = await fetch('http://localhost:5000/live_logs', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(apiData) });
                 const data = await response.json();
                 const logs = document.getElementById('logs');
                 document.getElementById('st-tag').style.color = "var(--green)";
                 document.getElementById('st-tag').innerText = "● ENGINE ONLINE";
-                
                 data.scans.forEach(scan => {
                     const div = document.createElement('div');
-                    let color = scan.signal ? "var(--gold)" : "var(--neon)";
-                    div.innerHTML = `> [${data.time}] <span style="color:${color}">${scan.msg}</span>`;
+                    div.innerHTML = `> [${data.time}] <span style="color:${scan.signal ? 'var(--gold)' : 'var(--neon)'}">${scan.msg}</span>`;
                     logs.prepend(div);
                 });
-
-                if(logs.childNodes.length > 12) logs.lastChild.remove();
+                if(logs.childNodes.length > 15) logs.lastChild.remove();
             } catch (e) {
                 document.getElementById('st-tag').style.color = "var(--red)";
                 document.getElementById('st-tag').innerText = "● ENGINE OFFLINE";
             }
         }
 
-        async function panicSell() {
-            // Envoi de la commande de clôture d'urgence au moteur
-            await fetch('http://localhost:5000/execute', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action: "PANIC_SELL", exchange: document.getElementById('ex-sel').value })
-            });
-        }
-
         function checkLogin() { if(document.getElementById('pin-entry').value === "197800") document.getElementById('login-screen').style.display='none'; }
         function setTab(id, el) { document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none'); document.getElementById(id).style.display='block'; document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
+        function tgF(el) { const a=el.nextElementSibling; a.style.display=a.style.display==='block'?'none':'block'; }
         
-        setInterval(syncEngineLogs, 5000); // Mise à jour toutes les 5s
+        setInterval(syncEngineLogs, 5000);
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
     </script>
 </body>
-                                                                                        </html>
-                                                                                        
+    </html>
+    
