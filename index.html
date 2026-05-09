@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>BLACKSNIPER SMC - GLOBAL</title>
+    <title>BLACKSNIPER SMC - GLOBAL CCXT</title>
     <style>
         :root { --bg: #05070a; --neon: #00f2ff; --gold: #ffc107; --text: #f8fafc; --red: #ff3333; --green: #00ff88; --border: rgba(255, 255, 255, 0.1); }
         body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; }
@@ -23,152 +23,180 @@
         .glass-card { background: rgba(15, 20, 28, 0.95); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
         #realtime-monitor { background: #000; border-radius: 12px; padding: 15px; height: 180px; font-family: 'Courier New', monospace; font-size: 10px; color: var(--neon); overflow-y: auto; border: 1px solid var(--border); }
         
-        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; margin-top: 8px; box-sizing: border-box; }
-        .member-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
-        .faq-q { padding: 12px; cursor: pointer; font-size: 11px; font-weight: bold; background: rgba(255,255,255,0.02); border-radius: 8px; margin-top: 5px; }
-        .faq-a { display: none; padding: 12px; font-size: 10px; color: #aaa; }
+        input, select, textarea { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 8px; color: white; margin-top: 8px; box-sizing: border-box; font-family: inherit; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <div id="l-txt" style="color:var(--gold); font-weight:bold; letter-spacing:3px; margin-bottom:20px;">BLACKSNIPER ACCESS</div>
+        <div id="l-txt" style="color:var(--gold); font-weight:bold; letter-spacing:3px; margin-bottom:20px;">ACCÈS BLACKSNIPER</div>
         <input type="password" id="pin-entry" class="pin-box" maxlength="6" placeholder="••••••">
-        <button id="l-btn" style="width:140px; background:#3b82f6; color:white; border:none; padding:15px; border-radius:10px; font-weight:bold;" onclick="checkLogin()">UNLOCK</button>
+        <button id="l-btn" style="width:140px; background:#3b82f6; color:white; border:none; padding:15px; border-radius:10px; font-weight:bold;" onclick="checkLogin()">DÉVERROUILLER</button>
     </div>
 
     <div class="top-status-bar">
         <div id="clock">00:00:00</div>
         <select id="langSwitcher" class="lang-select" onchange="translateEverything()">
-            <option value="fr">🇫🇷 FR</option>
-            <option value="en">🇬🇧 EN</option>
-            <option value="es">🇪🇸 ES</option>
-            <option value="de">🇩🇪 DE</option>
-            <option value="ar">🇸🇦 AR</option>
+            <option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option>
+            <option value="es">🇪🇸 ES</option><option value="de">🇩🇪 DE</option><option value="ar">🇸🇦 AR</option>
         </select>
     </div>
 
     <div class="content-area">
+        <!-- DASHBOARD -->
         <div id="dash" class="tab-content">
             <div class="glass-card">
                 <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:15px;">
-                    <span id="st-tag" style="color:var(--red);">● ENGINE OFFLINE</span>
+                    <span id="st-tag" style="color:var(--red);">● MOTEUR HORS LIGNE</span>
                 </div>
                 <div style="display:flex; justify-content:space-around; margin-bottom:20px; text-align:center;">
                     <div><small id="t-cap">CAPITAL</small><div id="display-cap" style="font-size:22px; color:var(--gold); font-weight:bold;">$0.00</div></div>
-                    <div><small id="t-pnl">PNL LIVE</small><div id="live-pnl" style="font-size:22px; color:var(--green); font-weight:bold;">+$0.00</div></div>
+                    <div><small id="t-pnl">PNL EN DIRECT</small><div id="live-pnl" style="font-size:22px; color:var(--green); font-weight:bold;">+$0.00</div></div>
                 </div>
-                <div id="realtime-monitor"><div id="logs">> WAITING FOR SERVER...</div></div>
+                <div id="realtime-monitor"><div id="logs">> EN ATTENTE DE CONNEXION CCXT...</div></div>
             </div>
-            <button id="b-panic" onclick="panicSell()" style="width:100%; padding:16px; background:var(--red); border:none; border-radius:12px; color:white; font-weight:bold;">🚨 PANIC SELL</button>
+            <button id="btn-panic" onclick="panicSell()" style="width:100%; padding:16px; background:var(--red); border:none; border-radius:12px; color:white; font-weight:bold;">🚨 VENTE DE PANIQUE</button>
         </div>
 
-        <div id="macro" class="tab-content" style="display:none;">
-            <div class="glass-card" style="padding:0; height: 500px;">
-                <iframe src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=2,3&features=datepicker,timezone&countries=25,32,6,37,7,5,22,39,14,10,35,43,56,36,110,11,26,12,4,17,38,42,15,45,72,35,43&calType=day&timeZone=58&lang=5" width="100%" height="100%" frameborder="0" allowtransparency="true"></iframe>
-            </div>
-        </div>
-
-        <div id="team" class="tab-content" style="display:none;">
-            <div class="glass-card">
-                <h3 id="t-owner" style="color:var(--gold); margin-top:0;">FOUNDER & DEV</h3>
-                <div class="member-line" style="background:rgba(255,193,7,0.1); padding:10px; border-radius:10px;">
-                    <span style="font-weight:bold;">MASTER NASSER</span><span id="r-owner">Propriétaire</span>
-                </div>
-                <h3 id="t-leaders" style="margin-top:20px;">SHIELD LEADERS</h3>
-                <div id="team-members">
-                    <div class="member-line"><span>Albert (Togo)</span><span style="color:var(--neon)">Marketing Lead</span></div>
-                    <div class="member-line"><span>Marie (Guadeloupe)</span><span style="color:var(--neon)">Community Manager</span></div>
-                    <div class="member-line"><span>Sébastien (Bénin)</span><span style="color:var(--neon)">Analyste Pro</span></div>
-                    <div class="member-line"><span>Bertrand (Douala)</span><span style="color:var(--neon)">Support Technique</span></div>
-                </div>
-                <hr style="border:0.5px solid var(--border); margin:20px 0;">
-                <h3 id="t-faq">FAQ</h3>
-                <div class="faq-q" id="q1" onclick="tgF(this)">1. Activation ?</div><div class="faq-a" id="a1">Liez vos clés API dans l'onglet réglages.</div>
-                <div class="faq-q" id="q2" onclick="tgF(this)">2. Sécurité ?</div><div class="faq-a" id="a2">Accès protégé par PIN et cryptage local.</div>
-            </div>
-        </div>
-
+        <!-- CONFIGURATION API -->
         <div id="config" class="tab-content" style="display:none;">
             <div class="glass-card">
-                <h3 id="t-config">API SETUP</h3>
-                <select id="ex-sel">
-                    <option>BINGX</option><option>OKX</option><option>BYBIT</option><option>BINANCE</option>
-                    <option>DERIV</option><option>ADMIRALS</option><option>EXNESS</option><option>BITGET</option>
-                    <option>GATE IO</option><option>KUCOIN</option><option>KRAKEN</option><option>LBANK</option>
-                </select>
-                <input type="text" id="ph-api" placeholder="API KEY">
-                <input type="password" id="i-sec" placeholder="SECRET KEY">
+                <h3 id="t-config" style="color:var(--gold); margin-top:0;">ACCÈS UNIVERSEL CCXT</h3>
+                
+                <label id="l-ex" style="font-size:11px; color:var(--neon);">NOM DE L'ÉCHANGEUR (ex: mexc, binance...)</label>
+                <input type="text" id="ex-id" placeholder="Taper le nom CCXT ici..." style="border: 1px solid var(--neon);">
+                
+                <input type="text" id="ph-api" placeholder="CLÉ API">
+                <input type="password" id="i-sec" placeholder="CLÉ SECRÈTE">
+                
                 <div style="margin-top:15px; border-top:1px solid var(--border); padding-top:10px;">
-                    <label style="font-size:11px; color:var(--gold);">TRADING BUDGET ($)</label>
-                    <input type="number" id="trading-amount" placeholder="Entrez votre capital (ex: 10, 25, 100...)" oninput="updateCapitalDisplay()">
+                    <label id="l-cap-val" style="font-size:11px; color:var(--gold);">CAPITAL ($)</label>
+                    <input type="number" id="trading-amount" placeholder="Ex: 10" oninput="document.getElementById('display-cap').innerText = '$' + this.value">
                 </div>
-                <button id="b-save" onclick="saveSettings()" style="width:100%; padding:16px; background:#3b82f6; border:none; border-radius:12px; color:white; font-weight:bold; margin-top:10px;">CONNECT</button>
+
+                <div style="margin-top:15px;">
+                    <label id="l-projects" style="font-size:11px; color:var(--gold);">20 PROJETS DE PRÉCISION (Séparez par des virgules)</label>
+                    <textarea id="project-list" style="height:60px; font-size:10px; color:var(--neon);" placeholder="XAU/USDT, SOL/USDT..."></textarea>
+                </div>
+
+                <button id="b-save" style="width:100%; padding:16px; background:#3b82f6; border:none; border-radius:12px; color:white; font-weight:bold; margin-top:15px;">ACTIVER LE SHIELD</button>
             </div>
         </div>
+
+        <!-- MACRO & TEAM (Vides pour l'instant) -->
+        <div id="macro" class="tab-content" style="display:none;"><div class="glass-card">MACRO ENGINE</div></div>
+        <div id="team" class="tab-content" style="display:none;"><div class="glass-card">TEAM MANAGEMENT</div></div>
     </div>
 
     <div class="nav-bar">
-        <div class="nav-item active" id="n-dash" onclick="setTab('dash', this)">DASH</div>
-        <div class="nav-item" id="n-macro" onclick="setTab('macro', this)">MACRO</div>
-        <div class="nav-item" id="n-team" onclick="setTab('team', this)">TEAM</div>
-        <div class="nav-item" id="n-api" onclick="setTab('config', this)">API</div>
+        <div id="nav-dash" class="nav-item active" onclick="setTab('dash', this)">TABLEAU</div>
+        <div id="nav-config" class="nav-item" onclick="setTab('config', this)">API</div>
+        <div id="nav-macro" class="nav-item" onclick="setTab('macro', this)">MACRO</div>
+        <div id="nav-team" class="nav-item" onclick="setTab('team', this)">ÉQUIPE</div>
     </div>
 
     <script>
-        const dict = {
-            fr: { lt:"ACCÈS BLACKSNIPER", lb:"DÉVERROUILLER", nd:"DASHBOARD", nm:"MACRO", nt:"ÉQUIPE", na:"RÉGLAGES", cap:"CAPITAL", pnl:"PNL LIVE", own:"FONDATEUR & DEV", lead:"LEADERS DU SHIELD", conf:"CONFIG API", save:"CONNECTER" },
-            en: { lt:"BLACKSNIPER ACCESS", lb:"UNLOCK", nd:"DASHBOARD", nm:"MACRO", nt:"TEAM", na:"CONFIG", cap:"CAPITAL", pnl:"LIVE PNL", own:"FOUNDER & DEV", lead:"SHIELD LEADERS", conf:"API SETUP", save:"CONNECT" },
-            es: { lt:"ACCESO BLACKSNIPER", lb:"DESBLOQUEAR", nd:"TABLERO", nm:"MACRO", nt:"EQUIPO", na:"AJUSTES", cap:"CAPITAL", pnl:"PNL EN VIVO", own:"FUNDADOR", lead:"LÍDERES", conf:"CONFIG API", save:"CONECTAR" },
-            de: { lt:"BLACKSNIPER ZUGANG", lb:"ENTSPERREN", nd:"DASHBOARD", nm:"MAKRO", nt:"TEAM", na:"SETUP", cap:"KAPITAL", pnl:"LIVE PNL", own:"GRÜNDER", lead:"LEADER", conf:"API SETUP", save:"VERBINDEN" },
-            ar: { lt:"دخول BLACKSNIPER", lb:"فتح", nd:"لوحة التحكم", nm:"ماكرو", nt:"الفريق", na:"إعدادات", cap:"رأس المال", pnl:"الأرباح", own:"المؤسس", lead:"القادة", conf:"إعداد API", save:"اتصال" }
+        const translations = {
+            fr: {
+                access: "ACCÈS BLACKSNIPER", unlock: "DÉVERROUILLER", offline: "● MOTEUR HORS LIGNE", connected: "● CCXT CONNECTÉ : ",
+                capital: "CAPITAL", pnl: "PNL EN DIRECT", panic: "🚨 VENTE DE PANIQUE", config_title: "ACCÈS UNIVERSEL CCXT",
+                label_exchange: "NOM DE L'ÉCHANGEUR (ex: mexc, binance...)", label_cap: "CAPITAL ($)", label_projects: "20 PROJETS DE PRÉCISION (Séparez par des virgules)",
+                btn_save: "ACTIVER LE SHIELD", wait_handshake: "> EN ATTENTE DE CONNEXION CCXT...", placeholder_ex: "Taper le nom CCXT ici...",
+                placeholder_api: "CLÉ API", placeholder_sec: "CLÉ SECRÈTE", nav_dash: "TABLEAU", nav_config: "API", nav_macro: "MACRO", nav_team: "ÉQUIPE"
+            },
+            en: {
+                access: "BLACKSNIPER ACCESS", unlock: "UNLOCK", offline: "● ENGINE OFFLINE", connected: "● CCXT CONNECTED: ",
+                capital: "CAPITAL", pnl: "LIVE PNL", panic: "🚨 PANIC SELL", config_title: "UNIVERSAL CCXT ACCESS",
+                label_exchange: "EXCHANGE NAME (e.g. mexc, binance...)", label_cap: "CAPITAL ($)", label_projects: "20 PRECISION PROJECTS (Comma separated)",
+                btn_save: "ACTIVATE SHIELD", wait_handshake: "> WAITING FOR CCXT HANDSHAKE...", placeholder_ex: "Type CCXT name here...",
+                placeholder_api: "API KEY", placeholder_sec: "SECRET KEY", nav_dash: "DASH", nav_config: "API", nav_macro: "MACRO", nav_team: "TEAM"
+            },
+            es: {
+                access: "ACCESO BLACKSNIPER", unlock: "DESBLOQUEAR", offline: "● MOTOR FUERA DE LÍNEA", connected: "● CCXT CONECTADO: ",
+                capital: "CAPITAL", pnl: "PNL EN VIVO", panic: "🚨 VENTA DE PÁNICO", config_title: "ACCESO UNIVERSAL CCXT",
+                label_exchange: "NOMBRE DEL INTERCAMBIO (ej: mexc...)", label_cap: "CAPITAL ($)", label_projects: "20 PROYECTOS DE PRECISIÓN (Separados por comas)",
+                btn_save: "ACTIVAR SHIELD", wait_handshake: "> ESPERANDO CONEXIÓN CCXT...", placeholder_ex: "Escriba el nombre CCXT aquí...",
+                placeholder_api: "CLAVE API", placeholder_sec: "CLAVE SECRETA", nav_dash: "PANEL", nav_config: "API", nav_macro: "MACRO", nav_team: "EQUIPO"
+            },
+            de: {
+                access: "BLACKSNIPER ZUGRIFF", unlock: "ENTSPERREN", offline: "● ENGINE OFFLINE", connected: "● CCXT VERBUNDEN: ",
+                capital: "KAPITAL", pnl: "LIVE PNL", panic: "🚨 PANIKVERKAUF", config_title: "UNIVERSALER CCXT ZUGRIFF",
+                label_exchange: "BÖRSENNAME (z.B. mexc, binance...)", label_cap: "KAPITAL ($)", label_projects: "20 PRÄZISIONSPROJEKTE (Mit Komma trennen)",
+                btn_save: "SHIELD AKTIVIEREN", wait_handshake: "> WARTE AUF CCXT-VERBINDUNG...", placeholder_ex: "CCXT-Namen hier eingeben...",
+                placeholder_api: "API-SCHLÜSSEL", placeholder_sec: "GEHEIMER SCHLÜSSEL", nav_dash: "DASH", nav_config: "API", nav_macro: "MAKRO", nav_team: "TEAM"
+            },
+            ar: {
+                access: "دخول بلاك سنايبر", unlock: "فتح القفل", offline: "● المحرك غير متصل", connected: "● متصل بـ CCXT : ",
+                capital: "رأس المال", pnl: "الربح والخسارة المباشر", panic: "🚨 بيع اضطراري", config_title: "وصول CCXT العالمي",
+                label_exchange: "اسم المنصة (مثال: mexc, binance...)", label_cap: "رأس المال ($)", label_projects: "20 مشروعاً دقيقاً (افصل بينها بفاصلة)",
+                btn_save: "تفعيل الدرع", wait_handshake: "> في انتظار اتصال CCXT...", placeholder_ex: "اكتب اسم المنصة هنا...",
+                placeholder_api: "مفتاح API", placeholder_sec: "المفتاح السري", nav_dash: "لوحة التحكم", nav_config: "الربط", nav_macro: "ماكرو", nav_team: "الفريق"
+            }
         };
 
-        function updateCapitalDisplay() {
-            const val = document.getElementById('trading-amount').value || "0.00";
-            document.getElementById('display-cap').innerText = "$" + val;
-        }
-
         function translateEverything() {
-            const l = document.getElementById('langSwitcher').value;
-            const d = dict[l] || dict['en'];
-            document.getElementById('l-txt').innerText = d.lt;
-            document.getElementById('l-btn').innerText = d.lb;
-            document.getElementById('n-dash').innerText = d.nd;
-            document.getElementById('n-macro').innerText = d.nm;
-            document.getElementById('n-team').innerText = d.nt;
-            document.getElementById('n-api').innerText = d.na;
-            document.getElementById('t-cap').innerText = d.cap;
-            document.getElementById('t-pnl').innerText = d.pnl;
-            document.getElementById('t-owner').innerText = d.own;
-            document.getElementById('t-leaders').innerText = d.lead;
-            document.getElementById('t-config').innerText = d.conf;
-            document.getElementById('b-save').innerText = d.save;
+            const lang = document.getElementById('langSwitcher').value;
+            const t = translations[lang];
+            document.body.style.direction = (lang === 'ar') ? 'rtl' : 'ltr';
+            document.getElementById('l-txt').innerText = t.access;
+            document.getElementById('l-btn').innerText = t.unlock;
+            document.getElementById('t-cap').innerText = t.capital;
+            document.getElementById('t-pnl').innerText = t.pnl;
+            document.getElementById('btn-panic').innerText = t.panic;
+            document.getElementById('t-config').innerText = t.config_title;
+            document.getElementById('ex-id').placeholder = t.placeholder_ex;
+            document.getElementById('ph-api').placeholder = t.placeholder_api;
+            document.getElementById('i-sec').placeholder = t.placeholder_sec;
+            document.getElementById('b-save').innerText = t.btn_save;
+            document.getElementById('l-ex').innerText = t.label_exchange;
+            document.getElementById('l-cap-val').innerText = t.label_cap;
+            document.getElementById('l-projects').innerText = t.label_projects;
+            document.getElementById('nav-dash').innerText = t.nav_dash;
+            document.getElementById('nav-config').innerText = t.nav_config;
+            document.getElementById('nav-macro').innerText = t.nav_macro;
+            document.getElementById('nav-team').innerText = t.nav_team;
         }
 
         async function syncEngineLogs() {
-            const apiData = { exchange: document.getElementById('ex-sel').value, ak: document.getElementById('ph-api').value, as: document.getElementById('i-sec').value, capital: document.getElementById('trading-amount').value };
+            const apiData = {
+                exchange: document.getElementById('ex-id').value.toLowerCase(),
+                ak: document.getElementById('ph-api').value,
+                as: document.getElementById('i-sec').value,
+                capital: document.getElementById('trading-amount').value,
+                projects: document.getElementById('project-list').value
+            };
+            if(!apiData.exchange) return;
             try {
-                const response = await fetch('http://localhost:5000/live_logs', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(apiData) });
+                const response = await fetch('http://localhost:5000/live_logs', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(apiData)
+                });
                 const data = await response.json();
                 const logs = document.getElementById('logs');
                 document.getElementById('st-tag').style.color = "var(--green)";
-                document.getElementById('st-tag').innerText = "● ENGINE ONLINE";
-                data.scans.forEach(scan => {
-                    const div = document.createElement('div');
-                    div.innerHTML = `> [${data.time}] <span style="color:${scan.signal ? 'var(--gold)' : 'var(--neon)'}">${scan.msg}</span>`;
-                    logs.prepend(div);
-                });
-                if(logs.childNodes.length > 15) logs.lastChild.remove();
+                document.getElementById('st-tag').innerText = translations[document.getElementById('langSwitcher').value].connected + apiData.exchange.toUpperCase();
+                if(data.scans) {
+                    data.scans.forEach(scan => {
+                        const div = document.createElement('div');
+                        div.innerHTML = `> [${data.time}] <span style="color:${scan.signal?'var(--gold)':'var(--neon)'}">${scan.msg}</span>`;
+                        logs.prepend(div);
+                    });
+                }
+                if(logs.childNodes.length > 25) logs.lastChild.remove();
             } catch (e) {
                 document.getElementById('st-tag').style.color = "var(--red)";
-                document.getElementById('st-tag').innerText = "● ENGINE OFFLINE";
+                document.getElementById('st-tag').innerText = translations[document.getElementById('langSwitcher').value].offline;
             }
         }
 
         function checkLogin() { if(document.getElementById('pin-entry').value === "197800") document.getElementById('login-screen').style.display='none'; }
-        function setTab(id, el) { document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none'); document.getElementById(id).style.display='block'; document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
-        function tgF(el) { const a=el.nextElementSibling; a.style.display=a.style.display==='block'?'none':'block'; }
+        function setTab(id, el) { 
+            document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none'); 
+            document.getElementById(id).style.display='block'; 
+            document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); 
+            el.classList.add('active'); 
+        }
         
         setInterval(syncEngineLogs, 5000);
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
